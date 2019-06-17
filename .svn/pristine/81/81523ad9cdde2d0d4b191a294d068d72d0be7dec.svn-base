@@ -1,0 +1,60 @@
+﻿using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Text;
+
+namespace HiDM.Reporting.Models
+{
+    public class EQPStatusMonitorOutput
+    {
+        public EQPStatusMonitorOutput()
+        {
+            data = new List<EQPStatusMonitorData>();
+            StatusDetails = new Dictionary<string, EQPStatusDetails>();
+        }
+        public long StartDate { get; set; }
+        public long EndDate { get; set; }
+        public List<EQPStatusMonitorData> data { get; set; }
+
+        public List<string> categories { get; set; }
+
+        public Dictionary<string, EQPStatusDetails> StatusDetails { get; set; }
+        
+    }
+
+
+    public class EQPStatusMonitorData
+    {
+        public string name { get; set; }
+        public ArrayList value { get; set; }
+
+        public dynamic itemStyle { get; set; }
+    }
+
+    public class EQPStatusDetails
+    {
+        public EQPStatusDetails()
+        {
+            StatusDetails = new List<EQPStatusDetailsItem>();
+            Colors = new List<string>();
+        }
+        public string EQPName { get; set; }
+
+        public List<EQPStatusDetailsItem> StatusDetails;
+
+        public List<String> Colors { get; set; }
+    }
+
+    public class EQPStatusDetailsItem
+    {
+
+        public string name { get; set; }
+        public string StartTime { get; set; }
+        public string EndTime { get; set; }
+
+        public double value { get; set; }
+    }
+    
+}

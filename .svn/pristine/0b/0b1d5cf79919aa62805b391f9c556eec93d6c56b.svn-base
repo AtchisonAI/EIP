@@ -1,0 +1,78 @@
+﻿using EIP.Common.Entities.Paging;
+using HiDM.Reporting.DataAccess;
+using HiDM.Reporting.Models;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace HiDM.Reporting.DataAccess
+{
+    public class HoldLotHistoryRepository : ReportingRepository, IHoldLotHistoryRepository
+    {
+        public DataTable GetHoldLotHistorySummarySync(HoldLotHistoryInput input)
+        {
+            string querySql = quereyHoldSumSQLBylot;
+            if (0 == string.Compare(input.analysisUnit, "wafer"))
+            {
+                querySql = quereyHoldSumSQLBywafer;
+            }
+            return base.QueryDataTable(querySql, "Summary", input.GetManualParams());
+        }
+
+        public PagedResults GetHoldlotHistroyListSync(HoldLotHistoryInput input)
+        {
+            return base.PagingQueryDataTable(queryHoldLotSQL, input);
+        }
+
+        public DataTable GetHoldLotHistoryPercentSync(HoldLotHistoryInput input)
+        {
+            string querySql = quereyHoldpertimeSQLBylot;
+            if(0 == string.Compare(input.analysisUnit, "wafer"))
+            {
+                querySql = quereyHoldpertimeSQLBywafer;
+            }
+            return base.QueryDataTable(querySql, "Summary", input.GetManualParams());
+        }
+
+        public DataTable GetModuleListSync(Models.GetModuleListInput input)
+        {
+            return base.QueryDataTable(quereyModuleSQL, "Summary", input.GetManualParams());
+        }
+
+        private string queryHoldLotSQL = @"select hlht.* , @rowNumber, @recordCount from holdlothistory hlht @where 
+                                         AND hlht.holdmodule = DECODE(NVL(:moduleCode,' '),' ',hlht.holdmodule,:moduleCode)
+                                         AND to_date(to_char(hlht.holdtime,'yyyymmdd'),'yyyymmdd') <= to_date(DECODE(NVL(:endDate,' '),' ',to_char(hlht.holdtime,'yyyymmdd'),:endDate),'yyyymmdd') 
+                                         AND to_date(to_char(hlht.holdtime,'yyyymmdd'),'yyyymmdd') >= to_date(DECODE(NVL(:beginDate,' '),' ',to_char(hlht.holdtime,'yyyymmdd'),:beginDate),'yyyymmdd') 
+                                         order by hlht.holdtime";
+
+        private string quereyHoldSumSQLBylot = @"select 'lots' Series ,hla.snapdate name,hla.HoldLots value from holdlothistoryanalysis hla where
+                                          hla.module = DECODE(NVL(:moduleCode,' '),' ',hla.module,:moduleCode)
+                                          AND to_date(hla.snapdate,'yyyymmdd') <= to_date(DECODE(NVL(:endDate,' '),' ',hla.snapdate,:endDate) ,'yyyymmdd') 
+                                          AND to_date(hla.snapdate,'yyyymmdd') >= to_date(DECODE(NVL(:beginDate,' '),' ',hla.snapdate,:beginDate),'yyyymmdd') 
+                                          order by hla.snapdate";
+
+        private string quereyHoldpertimeSQLBylot = @"select 'lots/time' Series ,hla.snapdate name,hla.Tlots as value from holdlothistoryanalysis hla where
+                                              hla.module = DECODE(NVL(:moduleCode,' '),' ',hla.module,:moduleCode)
+                                              AND to_date(hla.snapdate,'yyyymmdd') <= to_date(DECODE(NVL(:endDate,' '),' ',hla.snapdate,:endDate) ,'yyyymmdd') 
+                                              AND to_date(hla.snapdate,'yyyymmdd') >= to_date(DECODE(NVL(:beginDate,' '),' ',hla.snapdate,:beginDate) ,'yyyymmdd') 
+                                              order by hla.snapdate";
+
+
+        private string quereyHoldSumSQLBywafer = @"select 'wafers' Series ,hla.snapdate name,hla.HoldWafers value from holdlothistoryanalysis hla where
+                                          hla.module = DECODE(NVL(:moduleCode,' '),' ',hla.module,:moduleCode)
+                                          AND to_date(hla.snapdate,'yyyymmdd') <= to_date(DECODE(NVL(:endDate,' '),' ',hla.snapdate,:endDate) ,'yyyymmdd') 
+                                          AND to_date(hla.snapdate,'yyyymmdd') >= to_date(DECODE(NVL(:beginDate,' '),' ',hla.snapdate,:beginDate),'yyyymmdd') 
+                                          order by hla.snapdate";
+
+        private string quereyHoldpertimeSQLBywafer = @"select 'wfs/time' Series ,hla.snapdate name,hla.Twfs as value from holdlothistoryanalysis hla where
+                                              hla.module = DECODE(NVL(:moduleCode,' '),' ',hla.module,:moduleCode)
+                                              AND to_date(hla.snapdate,'yyyymmdd') <= to_date(DECODE(NVL(:endDate,' '),' ',hla.snapdate,:endDate) ,'yyyymmdd') 
+                                              AND to_date(hla.snapdate,'yyyymmdd') >= to_date(DECODE(NVL(:beginDate,' '),' ',hla.snapdate,:beginDate) ,'yyyymmdd') 
+                                              order by hla.snapdate";
+
+        private string quereyModuleSQL = @"select distinct 'module' Series ,emp.dept_code name,emp.dept_code value from emp order by emp.dept_code";
+    }
+}

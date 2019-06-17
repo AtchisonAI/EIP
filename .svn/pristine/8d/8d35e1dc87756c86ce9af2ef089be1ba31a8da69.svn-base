@@ -1,0 +1,80 @@
+﻿define(['reportingbootstrap'],
+    function (abc) {
+        initGird();
+        size = UtilWindowHeightWidth();
+    });
+
+//var chartDictionary;
+
+function windowResized() {
+    //if (chartDictionary != 'undefined') {
+    //    for (var key in chartDictionary) {
+    //        chartDictionary[key].resize();
+    //    }
+    //}
+}
+
+//初始化表格
+function initGird() {
+    $grid = $("#list").jgridview(
+        {
+            datatype: "json",
+            multiselect: true,
+            loadonce: false,
+            shrinkToFit: true,
+            url: '/Reporting/HoldLotHistory/QueryHoldLotHistory',
+            colModel: [
+                //假的grid并且隐藏 
+               // { label: "ID", name: "ID", index: "ID", width: 130, fixed: true },
+                { label: "Employ ID", name: "ID", index: "emp.ID", width: 130, fixed: true },
+                { label: "Chinese Name", name: "EMPLOYEE_NAME", width: 130, fixed: true },
+                { label: "English Name", name: "E_EMPLOYEE_NAME", index: "emp.E_EMPLOYEE_NAME", width: 130, fixed: true },
+                { label: "Email", name: "EMAIL", width: 130, fixed: true },
+                { label: "Pager", name: "PAGER", index: "emp.PAGER", width: 130, fixed: true },
+                { label: "Extension_No", name: "EXTENSION_NO", index: "emp.EXTENSION_NO", width: 50, fixed: true },
+                { label: "Chinese Title", name: "CHINESE_TITLE", width: 160, fixed: true },
+                { label: "English Title", name: "ENGLISH_TITLE", index: "emp.ENGLISH_TITLE", width: 130, fixed: true },
+                { label: "Dept Code", name: "DEPT_CODE", index: "emp.DEPT_CODE", width: 50, fixed: true },
+                { label: "Dept Name", name: "DEPT_NAME", sortable: false, width: 130, fixed: true },
+                { label: "E_Dept Name", name: "E_DEPT_NAME", width: 130, fixed: true },
+                { label: "Group Code", name: "GROUP_CODE", index: "emp.GROUP_CODE", width: 130, fixed: true },
+                { label: "Dir Manager", name: "DIR_MANAGER", index: "emp.DIR_MANAGER", width: 130, fixed: true },
+                { label: "Rep Empno", name: "REP_EMPNO", index: "emp.REP_EMPNO", width: 130, fixed: true },
+                { label: "Action Flag", name: "ACTION_FLAG", align: "center", fixed: true, width: 130 },
+                { label: "Rcd Date", name: "RCD_DATE", align: "center", fixed: true, width: 130 },
+                { label: "Basic Person", name: "BASIC_PERSON", align: "center", fixed: true, width: 130 },
+                { label: "Basic Org", name: "BASIC_ORG", align: "center", fixed: true, width: 130 }
+            ],
+            sortname: "ID",
+            height: 200,
+            sortorder: "asc",
+            loadComplete: function (json) {
+                if (json.rows.length > 0) {
+                    initFillChart(json.ExtraDatas.Summary)
+                }
+            }
+        });
+    $("#listhide").hide();
+}
+
+function initFillChart(data) {
+    var rowdiv;
+    $.each(data, function (i, item) {
+        if (i % 3 === 0) {
+            rowdiv = $('<div class="row"></div>');
+            $('#chartpnlbody').append(rowdiv);
+        }
+        var childdiv = $('<div class="col-lg-4"><div onclick="popDetailInfo(\''+item.title.text+'\')" id="'+ item.title.text+'" style="height:300px;" class="chart"><div></div>');
+        rowdiv.append(childdiv);
+
+        //初始化chart；
+        var chart = echarts.init(document.getElementById(item.title.text));
+        chart.setOption(item);
+    });
+
+    $charts = $('.chart');
+}
+
+function popDetailInfo(moduleCode) {
+    ArtDialogOpen("/Reporting/HoldLotHistoryDetailInfo/HoldLotHistoryDetail?moduleCode=" + moduleCode, "Hold lot History detail-" + moduleCode, true, 750, 1200, true);
+}

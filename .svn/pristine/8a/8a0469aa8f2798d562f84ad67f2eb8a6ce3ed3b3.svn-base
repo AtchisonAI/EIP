@@ -1,0 +1,134 @@
+﻿using EIP.Common.Business;
+using EIP.Common.Core.Attributes;
+using EIP.Common.Entities.Select2;
+using EIP.Common.Web;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+
+namespace EIP.Web.Areas.Common.Controllers
+{
+    public class CommonController : BaseController
+    {
+        private readonly ICommonLogic _CommonLogic;
+
+        public CommonController(ICommonLogic commonLogic)
+        {
+            _CommonLogic = commonLogic;
+        }
+
+        /// <summary>
+        ///     读取所有信息
+        /// </summary>
+        /// <returns></returns>
+        [CreateBy("徐涛")]
+        public JsonResult QueryProductSelectList(string productfamily, string product, int page)
+        {
+            if (product == null)
+            {
+                product = string.Empty;
+            }
+
+
+            string sql = @"select * from (select PRODUCTNAME id, PRODUCTNAME text, count(*) 
+over() as totalCount,row_number()  over (order by PRODUCTNAME) as rn from fwproductversion  where PRODUCTNAME like '" + product.Replace("'", "''") + "%' {0} GROUP BY PRODUCTNAME) where rn >" +
+                        (page - 1) * 10 + " and rn <" + page * 10;
+            string filter = string.Empty;
+            if (!string.IsNullOrWhiteSpace(productfamily))
+            {
+                filter = string.Format(" AND ProductFamily in ('{0}') ", productfamily);
+            }
+
+            sql = string.Format(sql, filter);
+            return Json(_CommonLogic.QuerySelectList("HiDM.Reporting.DataAccess",sql));
+        }
+
+
+        /// <summary>
+        ///     读取所有信息
+        /// </summary>
+        /// <returns></returns>
+        [CreateBy("徐涛")]
+        public JsonResult QueryProductFamilySelectList(string productfamily, int page)
+        {
+            if (productfamily == null)
+            {
+                productfamily = string.Empty;
+            }
+            string sql = @"select * from (select productfamily id, productfamily text, count(*) 
+over() as totalCount,row_number()  over (order by productfamily) as rn from fwproductversion  where productfamily like '" + productfamily.Replace("'", "''") + "%' and productfamily is not null GROUP BY productfamily) where rn >" +
+                        (page - 1) * 10 + " and rn <" + page * 10;
+
+            return Json(_CommonLogic.QuerySelectList("HiDM.Reporting.DataAccess", sql));
+        }
+
+        public JsonResult QueryTechIDSelectList(string selTechID, int page)
+        {
+            if (selTechID == null)
+            {
+                selTechID = string.Empty;
+            }
+            string sql = @"select * from (select TechID id, TechID text, count(*) 
+over() as totalCount,row_number()  over (order by TechID) as rn from TEST_FOR_CAROL_REPORT  where TECHID like '" + selTechID.Replace("'", "''") + "%' and TECHID is not null GROUP BY TechID) where rn >" +
+                        (page - 1) * 10 + " and rn <" + page * 10;
+
+            return Json(_CommonLogic.QuerySelectList("HiDM.Reporting.DataAccess", sql));
+        }
+
+        public JsonResult QueryCustomerIDSelectList(string selTechID, string selCustomerID, int page)
+        {
+            if (selCustomerID == null)
+            {
+                selCustomerID = string.Empty;
+            }
+
+            string sql = @"select * from (select CustomerID id, CustomerID text, count(*) 
+over() as totalCount,row_number()  over (order by CustomerID) as rn from TEST_FOR_CAROL_REPORT  where CustomerID like '" + selCustomerID.Replace("'", "''") + "%' {0} GROUP BY CustomerID) where rn >" +
+                        (page - 1) * 10 + " and rn <" + page * 10;
+            string filter = string.Empty;
+            if (!string.IsNullOrWhiteSpace(selTechID))
+            {
+                filter = string.Format(" AND TechID in ('{0}') ", selTechID);
+            }
+
+            sql = string.Format(sql, filter);
+            return Json(_CommonLogic.QuerySelectList("HiDM.Reporting.DataAccess", sql));
+        }
+
+
+        
+          public JsonResult QueryselProductIDSelectList(string selProductID, string selTechID, string selCustomerID, int page)
+        {
+            if (selProductID == null) 
+            {
+                selProductID = string.Empty;
+            }
+
+
+            string sql = @"select * from (select ProductID id, ProductID text, count(*) 
+over() as totalCount,row_number()  over (order by ProductID) as rn from TEST_FOR_CAROL_REPORT  where ProductID like '" + selProductID.Replace("'", "''") + "%' {0} GROUP BY ProductID) where rn >" +
+                        (page - 1) * 10 + " and rn <" + page * 10;
+            string filter = string.Empty;
+            if (!string.IsNullOrWhiteSpace(selTechID))
+            {
+                filter = string.Format(" AND TechID in ('{0}') ", selTechID);
+            }
+            string filter1 = string.Empty;
+            if (!string.IsNullOrWhiteSpace(selCustomerID))
+            {
+                filter1 = string.Format(" AND CustomerID in ('{0}') ", selCustomerID);
+            }
+            string filter3 = string.Empty;
+            if (!string.IsNullOrWhiteSpace(filter) || !string.IsNullOrWhiteSpace(filter1))
+            {
+                filter3 =filter + filter1;
+            }
+            sql = string.Format(sql, filter3);
+            return Json(_CommonLogic.QuerySelectList("HiDM.Reporting.DataAccess", sql));
+        }
+
+
+    }
+}

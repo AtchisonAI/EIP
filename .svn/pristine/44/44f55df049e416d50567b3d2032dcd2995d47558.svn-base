@@ -1,0 +1,35 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using HiDM.Reporting.DataAccess;
+using EIP.Common.Entities.Paging;
+using HiDM.FactoryWorks.TibcoRV;
+using HiDM.Reporting.Models;
+using HiDM.FactoryWorks.Messages;
+using EIP.Common.Entities.ECharts;
+using EIP.Common.Entities;
+
+
+namespace HiDM.Reporting.Business
+{
+    public class WIPStatusLogic : IWIPStatusLogic
+    {
+        private IWIPStatusRepository _WIPStatusRepository;
+
+        public WIPStatusLogic(IWIPStatusRepository repository)
+        {
+            _WIPStatusRepository = repository;
+        }
+
+        public PagedResults QueryWIPStatus(Models.WIPStatusInput input)
+        {
+
+            var pageResults = _WIPStatusRepository.WIPStatus1(input);
+
+            return pageResults;
+        }
+
+    }
+}

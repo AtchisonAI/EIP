@@ -1,0 +1,92 @@
+﻿@using EIP.Common.Entities
+@using EIP.Common.Entities.Dtos
+@using EIP.Web.DataUsers.Helpers
+
+@{
+    ViewBag.Title = "Hold lot history detail Information";
+    ViewBag.Require = "reporting-coder-holdlothistorydetailinfo";<!--这里是注释不会在页面中显示，此处定义view使用的js文件，reporting-employinfo与实际的js文件名的映射关系在scripts/page.js中指定-->
+    Layout = "~/Views/Shared/_LayoutPageBaseList.cshtml";
+}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class=" panel panel-primary">
+                <div class="panel-body">
+                    <form class="form-inline  form-horizontal">
+                        <div class="form-group">
+                            <label for="Module" class="control-label  col-sm-4">Module:</label>
+                            <div class="col-sm-8">
+                                @Html.DropDownListSQL(new DropDownListSQLInput
+                                {
+                                ConnectionString = "HiDM.Reporting.DataAccess",
+                                SQL = "SELECT DEPT_CODE VALUE, DEPT_NAME NAME FROM EMP GROUP BY DEPT_CODE,DEPT_NAME",
+                                Name = "ModuleCode",
+                                NeedDefault = true,
+                                HtmlAttributes = new { @class = "form-control manualfilter" }
+                                })
+                                <input type="text" id="moduleHidden" value="@ViewBag.ModuleCode" hidden />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="Begindate" class="control-label col-sm-6"><span class="need">*</span>Begin date(开始日期):</label>
+                            <div class="col-sm-6">
+                                <input id="beginDate" type="text" name="beginDate" readonly style="background-color:white;" class="form-control manualfilter text-left" onfocus="WdatePicker({dateFmt:'yyyyMMdd',readOnly:true})" value="@ViewBag.beginDate"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="Enddate" class="control-label col-sm-6"><span class="need">*</span>End date(结束日期):</label>
+                            <div class="col-sm-6">
+                                <input id="endDate" type="text" name="endDate" readonly style="background-color:white;" class="form-control manualfilter text-left" onfocus="WdatePicker({dateFmt:'yyyyMMdd',readOnly:true})" value="@ViewBag.endDate"/>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="Analysisunit" class="control-label col-sm-7">分析单位:</label>
+                            <div class="col-sm-5 text-left">
+                                <select id="analysisUnit" name="analysisUnit" class="form-control manualfilter select2">
+                                    <option value="lot"> lot </option>
+                                    <option value="wafer"> wafer </option>
+                                </select>
+                                <input type="text" id="analysisUnitHidden" value="@ViewBag.analysisUnit" hidden />
+                            </div>
+                        </div>
+                        <div class="form-group pull-right">
+                            <div class="col-sm-6">
+                                <input type="button" name="btn_select_box" value="搜 索" class="btn btn-primary pull-right" />
+                            </div>
+                            <div class="col-sm-6">
+                                <input type="button" name="btn_reset_box" value="重 置" class="btn pull-right">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Hold lot history Details</h3>
+                </div>
+                <div class="panel-body" id="listpnlbody">
+                    <table id="list" class="grid"></table>
+                    <div id="pager"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Hold lot summary</h3>
+                </div>
+                <div class="panel-body" id="chartpnlbody">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

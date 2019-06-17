@@ -1,0 +1,29 @@
+﻿@using EIP.Common.Entities
+@using EIP.Common.Entities.Dtos
+@using EIP.Web.DataUsers.Helpers
+
+@{
+    ViewBag.Title = "Hold lot history";
+    ViewBag.Require = "reporting-holdlothistory";<!--这里是注释不会在页面中显示，此处定义view使用的js文件，reporting-employinfo与实际的js文件名的映射关系在scripts/page.js中指定-->
+    Layout = "~/Views/Shared/_LayoutPageBaseList.cshtml";
+}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Hold lot summary</h3>
+                </div>
+                <div class="panel-body" id="chartpnlbody">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="list" id="listhide">
+     <table id="list"></table>
+     <div id="pager"></div>
+</div>

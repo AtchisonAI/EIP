@@ -1,0 +1,111 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using EIP.Common.Entities.Paging;
+using System.Data;
+
+namespace HiDM.Reporting.DataAccess
+{
+    public class QueryInfoRepository:ReportingRepository, IQueryInfoRepository
+    {
+        public PagedResults GetQueryInfoList(Models.QueryInfoInput InfoInput)
+        {
+            string filter2 = string.Empty;
+            if (InfoInput.ProductID != null && InfoInput.ProductID.Length > 0)
+            {
+                filter2 = string.Format("AND ProductID IN ('{0}') ", InfoInput.ProductID);
+            }
+            string filter3 = string.Empty;
+            if (InfoInput.Priority != null && InfoInput.Priority.Length > 0)
+            {
+                filter3 = string.Format("AND Priority IN ('{0}') ", InfoInput.Priority);
+            }
+            string filter4 = string.Empty;
+            if (InfoInput.InternalPriority != null && InfoInput.InternalPriority.Length > 0)
+            {
+                filter4 = string.Format("AND InternalPriority IN ('{0}') ", InfoInput.InternalPriority);
+            }
+            string filter = string.Empty;
+            filter = filter2 + filter3 + filter4;
+
+            string filter1 = string.Empty;
+            if (InfoInput.Bydate != null && InfoInput.Bydate.Length > 0) {
+                if (InfoInput.Bydate == "M") {
+                    filter1 = "SELECT to_char(v_date,'YY'||'MM') as v_date";
+                }
+                if (InfoInput.Bydate == "W")
+                {
+                    filter1 = "SELECT to_char(v_date,'YY'||'WW') as v_date";
+                }
+                if (InfoInput.Bydate == "D")
+                {
+                    filter1 = "SELECT v_date";
+                }
+            }
+
+            listSQL =filter1 + listSQL;
+            string sql = string.Format(listSQL, filter);
+            return base.PagingQueryDataTable(sql, InfoInput);
+        }
+
+
+        public PagedResults GetQueryInfoList1(Models.QueryInfoInput InfoInput)
+        {
+            string filter2 = string.Empty;
+            if (InfoInput.ProductID != null && InfoInput.ProductID.Length > 0)
+            {
+                filter2 = string.Format("AND ProductID IN ('{0}') ", InfoInput.ProductID);
+            }
+            string filter3 = string.Empty;
+            if (InfoInput.Priority != null && InfoInput.Priority.Length > 0)
+            {
+                filter3 = string.Format("AND Priority IN ('{0}') ", InfoInput.Priority);
+            }
+            string filter4 = string.Empty;
+            if (InfoInput.InternalPriority != null && InfoInput.InternalPriority.Length > 0)
+            {
+                filter4 = string.Format("AND InternalPriority IN ('{0}') ", InfoInput.InternalPriority);
+            }
+            string filter = string.Empty;
+            filter = filter2 + filter3 + filter4;
+
+            string filter1 = string.Empty;
+            if (InfoInput.Bydate != null && InfoInput.Bydate.Length > 0)
+            {
+                if (InfoInput.Bydate == "M")
+                {
+                    filter1 = "SELECT to_char(v_date,'YY'||'MM') as v_date";
+                }
+                if (InfoInput.Bydate == "W")
+                {
+                    filter1 = "SELECT to_char(v_date,'YY'||'WW') as v_date";
+                }
+                if (InfoInput.Bydate == "D")
+                {
+                    filter1 = "SELECT v_date";
+                }
+            }
+
+            listSQL = filter1 + listSQL1;
+            string sql = string.Format(listSQL, filter);
+            return base.PagingQueryDataTable(sql, InfoInput);
+        }
+
+        private string listSQL = @",LOTTYPE,BOH,EOH,MOVESTAGE,round(movestage/EOH,2) as TR,
+       @rowNumber, @recordCount
+       FROM TEST_FOR_CAROL_REPORT 
+       where  V_DATE between to_date(:StartTime,'yyyy-mm-dd hh24:mi:ss') and to_date(:EndTime,'yyyy-mm-dd hh24:mi:ss')
+       AND lottype='P' {0} order by v_date";
+
+
+        private string listSQL1 = @",LOTTYPE,BOH,EOH,MOVESTAGE,round(movestage/EOH,2) as TR,
+       @rowNumber, @recordCount
+       FROM TEST_FOR_CAROL_REPORT 
+       @where  V_DATE between to_date(:StartTime,'yyyy-mm-dd hh24:mi:ss') and to_date(:EndTime,'yyyy-mm-dd hh24:mi:ss')
+       AND lottype='F'{0} order by v_date";
+
+
+    }
+}

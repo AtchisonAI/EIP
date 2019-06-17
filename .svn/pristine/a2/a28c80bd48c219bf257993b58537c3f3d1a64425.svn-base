@@ -1,0 +1,62 @@
+﻿@using EIP.Common.Entities
+@using EIP.Common.Entities.Dtos
+@using EIP.Web.DataUsers.Helpers
+
+@{
+    ViewBag.Title = "Hold WIP Report";
+    ViewBag.Require = "reporting-holdwipreport-querywipholdinfo";
+    Layout = "~/Views/Shared/_LayoutPageBaseList.cshtml";
+}
+
+<div class="ui-layout-center" style="border-style: none">
+    <div id="layout" class="layoutdiv ui-layout-container">
+        <div id="uiCenter" class="ui-layout-center" style="border-style: none">
+            <div id="layoutToolBar" class="layoutdiv ui-layout-container">
+                <div id="uiCenterToolBar" class="ui-layout-center" style="border-style: none">
+                    <table id="list"></table>
+                    <div id="pager"></div>
+
+                </div>
+                <div id="uiNorthToolBar" class="ui-layout-north" style="border-color: #ccc; border-style: solid; border-width: 1px">
+                    <div class="tools-box">
+                        <div class="tools-box-left" id="partial_button_toolbar">
+                            @{ Html.RenderPartial("~/Areas/Common/Views/Shared/_PartialButton.cshtml"); }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="uiNorth" class="ui-layout-north" style="border-color: #ccc; border-style: solid; border-width: 1px">
+            <div class="select_box">
+                Lot Type：@Html.DropDownListSQL(new DropDownListSQLInput
+                {
+                ConnectionString = "HiDM.Reporting.DataAccess",
+                SQL = "select t.LotType as value, t.Description as name from FwLotTemplate T, FwLot L where T.lotTemplate = L.sysId and L.materialType != 'Durable' order by T.lotType",
+                Name = "LotID",
+                NeedDefault = true,
+                HtmlAttributes =  new { @class = "manualfilter"}
+
+                })
+                Location：@Html.DropDownListSQL(new DropDownListSQLInput
+                {
+                ConnectionString = "HiDM.Reporting.DataAccess",
+                SQL = "select distinct RTRIM(EEX.area, ' ') as value, MAV.description as name from FabEqpEquipmentExt EEX, FwMfgAreaVersion MAV where EEX.area = MAV.name(+) and MAV.revState(+) = 'Active'and EEX.area is not null",
+                Name = "HoldToDept",
+                NeedDefault = true,
+                HtmlAttributes =  new { @class = "manualfilter"}
+
+                })
+                <input type="button" name="btn_select_box" value="Submit" class="btnSearch">
+                <input type="button" name="btn_reset_box" value="重 置" class="btnSearch">
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="uiSouth" class="ui-layout-south" style="border-color: #ccc; border-style: solid; border-width: 1px;overflow: auto">
+    <div class="det_inner" id="browserAnalysis" style="height: 500px"></div>
+</div>
+
+
+<!--  select t.LotType as value, t.Description as name from FwLotTemplate T, FwLot L where T.lotTemplate = L.sysId and L.materialType != 'Durable' order by T.lotType
+-->

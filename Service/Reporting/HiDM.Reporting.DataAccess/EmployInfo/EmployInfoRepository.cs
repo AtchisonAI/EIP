@@ -1,0 +1,61 @@
+﻿using EIP.Common.Entities.Paging;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace HiDM.Reporting.DataAccess
+{
+    public class EmployInfoRepository : ReportingRepository, IEmployInfoRepository
+    {
+        public Task<PagedResults> GetEmployListAsync(Models.QueryEmployInfoInput input) 
+        {
+            return base.PagingQueryAsyncDataTable(QueryEmployListSQL, input);
+        }
+
+        public Task<DataTable> GetEmploySummaryAsync(Models.QueryEmployInfoInput input)
+        {
+            return base.QueryAsyncDataTable(QueryEmploySummarySQL, "Summary", input.GetManualParams());
+        }
+
+        public PagedResults GetEmployListSync(Models.QueryEmployInfoInput input)
+        {
+            return base.PagingQueryDataTable(QueryEmployListSQL, input);
+        }
+
+        public DataTable GetEmploySummarySync(Models.QueryEmployInfoInput input)
+        {
+            return base.QueryDataTable(QueryEmploySummarySQL, "Summary", input.GetManualParams());
+        }
+
+        public DataTable[] GetEmploySummaryListSync(Models.QueryEmployInfoInput input)
+        {
+            DataTable[] infoSummary = new DataTable[2];
+            infoSummary[0] = base.QueryDataTable(QueryEmploySummarySQL, "Summary", input.GetManualParams());
+            infoSummary[1] = base.QueryDataTable(QueryEmployPercentSQL, "Summary", input.GetManualParams());
+            return infoSummary;
+        }
+
+        //:EmployId 为model中的成员变量名
+        private string QueryEmployListSQL = @"select emp.id,emp.employee_name,emp.e_employee_name,emp.email,
+                                              emp.pager,emp.extension_no,emp.chinese_title,emp.english_title,
+                                              emp.dept_code,emp.dept_name,emp.e_dept_name,emp.group_code,
+                                              emp.dir_manager,emp.rep_empno,emp.action_flag,emp.rcd_date,
+                                              emp.basic_person,emp.basic_org,@rowNumber, @recordCount 
+                                              from emp @where AND emp.id = DECODE(NVL(:EmployId,' '),' ',id,:EmployId)
+                                              AND emp.dept_code = DECODE(NVL(:DepetCode,' '),' ',emp.dept_code,:DepetCode)";
+
+        private string QueryEmploySummarySQL = @"select 'count' Series ,emp.dept_code name,count(emp.id) value from emp where
+                                               emp.id = DECODE(NVL(:EmployId,' '),' ',id,:EmployId) 
+                                               AND emp.dept_code = DECODE(NVL(:DepetCode,' '),' ',emp.dept_code,:DepetCode) 
+                                               group by emp.dept_code order by emp.dept_code DESC";
+
+        private string QueryEmployPercentSQL = @"select 'percentage' Series ,emp.dept_code name,ROUND(count(emp.id)/cnt.cnt,2) 
+                                               as value from emp left join (select count(*) cnt from emp) cnt on 1=1 where
+                                               emp.id = DECODE(NVL(:EmployId,' '),' ',id,:EmployId) 
+                                               AND emp.dept_code = DECODE(NVL(:DepetCode,' '),' ',emp.dept_code,:DepetCode) 
+                                               group by emp.dept_code,cnt.cnt order by emp.dept_code DESC";
+    }
+}

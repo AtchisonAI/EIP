@@ -1,0 +1,73 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using EIP.Common.Entities.Paging;
+using System.Data;
+
+namespace HiDM.Reporting.DataAccess
+{
+    public class WuQiRepository : ReportingRepository, IWuQiRepository
+    {
+
+        public PagedResults GetLotInfoList(Models.WuQiInput input)
+        {
+            string filter = string.Empty;
+            if (input.ProductName !=null && input.ProductName.Length > 0)
+            {
+                filter = string.Format("AND ProductName IN ('{0}') ", input.ProductName);
+            }
+
+            string sql = string.Format(listSQL, filter);
+            return base.PagingQueryDataTable(sql, input);
+        }
+
+        public DataTable GetLotStatusSummary(Models.WuQiInput input)
+        {
+            string filter = string.Empty;
+            if (input.ProductName != null && input.ProductName.Length > 0)
+            {
+                filter = string.Format("AND ProductName IN ('{0}') ",input.ProductName);
+            }
+
+            string sql = string.Format(summaySQL, filter);
+
+            return base.QueryDataTable(sql, "Summary");
+        }
+
+
+        private string listSQL = @"SELECT LOT.APPID LOTID,
+       PLANNAME,
+       PRODUCTNAME,
+       FWS.CURRENTQTY QTY,
+       STAGENAME,
+       LOT.TRANSPORTID CARRIERID,
+       STEPNAME,
+       PROCESSINGSTATUS,
+       EXTRASTATUS,       
+       @rowNumber, @recordCount
+  FROM FWLOT LOT
+  LEFT JOIN FABLOTEXT LOTEXT ON LOT.SYSID = LOTEXT.PARENT
+  LEFT JOIN FWWIPSTEP FWS
+  ON LOT.SYSID = FWS.LOTOBJECT
+ @where AND LOT.LOTTYPE <> 'CAR'
+   AND LOT.LOTTYPE <> 'Material'
+   AND PLANNAME IS NOT NULL
+   AND PROCESSINGSTATUS <> 'Terminated'
+   {0}";
+
+        private string summaySQL = @"SELECT PRODUCTNAME Series,COUNT(*) CNT,EXTRASTATUS STATUS
+            FROM FWLOT LOT
+  LEFT JOIN FABLOTEXT LOTEXT ON LOT.SYSID = LOTEXT.PARENT
+  LEFT JOIN FWWIPSTEP FWS
+  ON LOT.SYSID = FWS.LOTOBJECT
+WHERE LOT.LOTTYPE <> 'CAR'
+   AND LOT.LOTTYPE <> 'Material'
+   AND PLANNAME IS NOT NULL
+   AND PROCESSINGSTATUS <> 'Terminated'
+   {0}
+   GROUP BY EXTRASTATUS,PRODUCTNAME";
+
+    }
+}

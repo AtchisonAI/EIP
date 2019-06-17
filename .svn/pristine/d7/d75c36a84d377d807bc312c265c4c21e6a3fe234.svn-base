@@ -1,0 +1,99 @@
+﻿define(['reportingbootstrap'],
+    function (abc) {
+        initGird();
+        size = UtilWindowHeightWidth();
+});
+
+
+var size;//宽高
+
+
+//重置流程
+//ResetBefore
+//如果 ResetBefore 返回 true
+//  自动执行clearCondition();
+//  自动执行clearGrids();
+//  自动执行clearCharts();
+//  AdditionalReset
+
+function ResetBefore() {
+    //自动重置之前，执行，如果不希望执行自动重置逻辑，则返回false
+    return true;
+}
+
+function AdditionalReset() {
+
+    return true;
+}
+
+//提交流程
+//ValidateInput
+//如果 ValidateInput 返回 true
+//  BeforeSearchClick
+//  如果 BeforeSearchClick 返回 true
+//      自动执行获取条件
+//      自动执行所有class为grid的元素的reload事件
+//      AfterSearchClick
+function ValidateInput() {
+    //客户端条件验证，如果不通过，返回false
+   
+    return true;
+}
+
+function BeforeSearchClick() {
+    //点击查询按钮后，在查询前触发，如果不希望执行自动查询，可返回false
+    AdditionalReset();
+    //asdfadsfasdf
+    //adsfadsf
+    return true;
+}
+
+
+function AfterSearchClick() {
+    return true;
+}
+
+//默认执行class为grid和chart的自适应方法
+function windowResized() {
+
+}
+
+function loadGraph(data) {
+
+    // 基于准备好的dom，获取echarts实例
+    var myChart = echarts.getInstanceByDom(document.getElementById('browserAnalysis'));
+    myChart.setOption(data);
+    // 基于准备好的dom，获取echarts实例
+    var myChart1 = echarts.getInstanceByDom(document.getElementById('browserAnalysis1'));
+    myChart1.setOption(data);
+}
+
+//初始化表格
+function initGird() {
+        var grid = $("#list").jgridview(
+            {
+                datatype: "local",
+                multiselect: false,
+                loadonce: false,
+                shrinkToFit: true,
+                url: '/Reporting/WIPStatus/QueryWIPStatus',
+                colModel: [
+                    { label: "PRODUCTNAME", name: "PRODUCTNAME", width: 150, fixed: true },
+                    { label: "APPID", name: "APPID", width: 150, fixed: true },
+                    { label: "COMPONENTQTY", name: "COMPONENTQTY", width: 150, fixed: true },
+                    { label: "PRODUCTREVISION", name: "PRODUCTREVISION", width: 150, fixed: true },
+                    { label: "STEPNAME", name: "STEPNAME", width: 130, fixed: true },
+                    { label: "STEPSEQ", name: "STEPSEQ", width: 130, fixed: true },
+                    { label: "STEPREVISION", name: "STEPREVISION", width: 130, fixed: true },
+                    { label: "PROCESSOPERRATIONID", name: "PROCESSOPERATIONID", width: 200, fixed: true },
+                    { label: "SUBPLANID", name: "SUBPLANID", width: 200, fixed: true }
+                    
+                ],
+                sortname: "APPID",
+                height: '800px',
+                sortorder: "asc",
+                additionalLoadCompleteAction: function (json) {
+                }
+            });
+}
+

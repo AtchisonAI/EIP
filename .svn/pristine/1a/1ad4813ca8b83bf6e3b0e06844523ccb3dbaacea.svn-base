@@ -1,0 +1,291 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using EIP.Common.Entities.Paging;
+using HiDM.Reporting.Models;
+using HiDM.Reporting.Models.EQPStatusMonitor;
+
+namespace HiDM.Reporting.DataAccess
+{
+    public class WIPProfileRepository : ReportingRepository, IWIPProfileRepository
+    {
+
+        public DataTable QueryCWIP(Models.WIPProfileInput input)
+        {
+            string filter = string.Empty;
+            filter = Getfilter(input, "chart");
+            string sql = string.Format(listSQLCWIP, filter);
+            return base.QueryDataTable(sql, "Summary", input.GetManualParams());
+        }
+
+        public DataTable QueryMOVE(Models.WIPProfileInput input)
+        {
+            string filter = string.Empty;
+            filter = Getfilter(input, "chart");
+            string sql = string.Format(listSQLMOVE, filter);
+            return base.QueryDataTable(sql, "Summary", input.GetManualParams());
+        }
+
+        public DataTable QueryHoldWIP(Models.WIPProfileInput input)
+        {
+            string filter = string.Empty;
+            filter = Getfilter(input, "chart");
+            string sql = string.Format(listSQLHOLDWIP, filter);
+            return base.QueryDataTable(sql, "Summary", input.GetManualParams());
+        }
+
+        public  string Getfilter(WIPProfileInput input , string flag)
+        {
+            string s1 = "1";
+            string s2 = "1";
+            string s3 = "1";
+            if (flag == "data")
+            {
+                s1 = "hs.timeheresince";
+                s2 = "ProductName";
+                s3 = "lot.lottype";
+            }
+            else if (flag == "chart")
+            {
+                s1 = "RECORD_DATE";
+                s2 = "substr(partid,1,length(partid)-2)";
+                s3 = "lottype";
+            }
+
+            string filter = string.Empty;
+            if (input.IsIncludeEngLots == false)
+            {
+                filter = " AND " + s3 +" = 'P' ";
+            }
+
+            string filter2 = string.Empty;
+            if (input.Product != null && input.Product.Length > 0)
+            {
+                filter2 = string.Format(" AND "+ s2 +" IN ('{0}')", input.Product);
+            }
+
+            string filter3 = string.Empty;
+
+            if (flag == "data")
+            {
+                if (input.ByDate == "1")
+                {
+                    // System.DateTime currentTime = new System.DateTime();
+                    DateTime dt = DateTime.Now;
+                    // DateTime now = DateTime.Now;
+                    input.StartTime = dt.ToString();
+
+                    if (dt.Hour >= 8)
+                    {
+                        filter3 = " AND to_date(substr( " + s1 + ",0,15),'yyyy-mm-dd hh24:mi:ss') between to_date(substr(:StartTime,1,10) || ' 08:00:00','yyyy-mm-dd hh24:mi:ss') and to_date(:StartTime , 'yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                    else
+                    {
+                        filter3 = " AND to_date(substr(" + s1 + ",0,15),'yyyy-mm-dd hh24:mi:ss') between to_date(to_char(:StartTime-1,'yyyy-mm-dd') || ' 08:00:00','yyyy-mm-dd hh24:mi:ss') and to_date(:StartTime , 'yyyy-mm-dd hh24:mi:ss') ";
+                    }
+                }
+                else if (input.ByDate == "2")
+                {
+                    filter3 = " AND to_date(substr(" + s1 + ",0,15),'yyyy-mm-dd hh24:mi:ss') between to_date(to_char(to_date(:StartTime,'yyyy-mm-dd')-1,'yyyy-mm-dd') || ' 08:00:00','yyyy-mm-dd hh24:mi:ss') and to_date(:StartTime|| ' 08:00:00', 'yyyy-mm-dd hh24:mi:ss')";
+                }
+            }
+            else if (flag == "chart") {
+              
+                if (input.ByDate == "1")
+                {
+                        filter3 = " AND  to_date( " + s1 +  ",'yyyymmdd') = to_date(replace(:StartTime,'-',''),'yyyymmdd') ";
+                   
+                    }
+                    else if (input.ByDate == "2")
+                    {
+                        filter3 = "  AND  to_date( " + s1 + ",'yyyymmdd') = to_date(replace(:StartTime,'-',''),'yyyymmdd') ";
+                    }
+
+            }
+
+                string sumfilter = filter + filter2 + filter3;
+            return sumfilter;
+        }
+
+        public PagedResults GetWIPData(WIPProfileInput input)
+        {
+            string filter = string.Empty;
+            filter = Getfilter(input , "data");
+
+
+            string sql = string.Format(listSQL, filter);
+            return base.PagingQueryDataTable(sql, input);
+
+        }
+
+
+
+        public PagedResults GetLotForecast(LotForecastInput input)
+        {
+            return base.PagingQueryDataTable(lotForecastSQL, input);
+        }
+
+
+        public string lotForecastSQL = @"select W.sysId,
+       W.activity,
+       W.txnTimeStamp,
+       WSH.stepId,
+       SX.description,
+       WSH.handle,
+       WH.lotQuantity,
+       WSH.resourceType,
+       decode(substr(W.sysId, 1, 8),
+              '00000e82',
+              WSH.trackInLocation,
+              WSH.location) Equipment,
+       W.userId,
+       WH.lotType,
+       WH.planId,
+       WX.subPlanId,
+       WH.productId,
+       WH.area area,
+       WH.currentsite tunnelId,
+       WX.recipeId,
+       WX.reticleId,
+       WX.edcPlanId,
+       W.wipId,
+       C.briefdescription,       
+       @rowNumber, @recordCount
+  from fwlot                lot,
+       FwWipTransaction     W,
+       FwWipHistory         WH,
+       FwWipStepHistory     WSH,
+       FwComment            C,
+       FabWipTransactionExt WX,
+       FwStepVersion        SV,
+       FwExtStepSpec        SX
+ @where AND lot.APPID = :LotID
+   AND lot.sysid = W.lotObject(+)
+   and W.sysId = WH.wipTxn(+)
+   and W.wipStepRef = WSH.sysId(+)
+   and W.txnComment = C.sysId(+)
+   and W.sysId = WX.parent(+)
+   and substr(WSH.stepId, 1, instr(WSH.stepId, '.') - 1) = SV.stepname(+)
+   and substr(WSH.stepId, instr(WSH.stepId, '.') + 1, length(WSH.stepId)) =
+       SV.revision(+)
+   and SV.sysid = SX.parent(+)
+";
+
+        public string listSQLCWIP = @" SELECT X.STAGE as name,'CWIP' series, nvl(Z.componentqty,0) value
+  FROM (select SUM(Y.MOVELOTQTY) AS MOVELOTQTY,
+               SUM(Y.HOLDQTY) AS HOLDQTY,
+                Y.RECORD_DATE ,
+               Y.STAGE,
+               y.lottype,
+               y.partid 
+          from rpt_tbl_stage_move Y
+         GROUP BY Y.RECORD_DATE, Y.STAGE,Y.lottype, y.partid) X
+  LEFT JOIN (SELECT SUM(F.componentqty) AS componentqty, F.V_dATE, F.STAGENAME
+               FROM (select DISTINCT L.appid,
+                                     L.componentqty,
+                                     substr(L.startdate, 1, 8) AS V_dATE,
+                                     S.STAGENAME
+                       from fwlot L
+                    
+                       LEFT JOIN fwwipstep s ON l.sysid = s.lotobject
+                      where L.processingstatus in ('Active', 'Created')) F
+              GROUP BY F.V_dATE, F.STAGENAME) Z ON X.RECORD_DATE = Z.V_DATE
+                                               AND Z.STAGENAME = X.STAGE
+WHERE 1=1 {0} order by X.STAGE 
+";
+
+        public string listSQLMOVE = @" SELECT X.STAGE as name,'MOVELOTQTY' series, nvl(X.MOVELOTQTY,0) value
+  FROM (select SUM(Y.MOVELOTQTY) AS MOVELOTQTY,
+               SUM(Y.HOLDQTY) AS HOLDQTY,
+                Y.RECORD_DATE ,
+               Y.STAGE,
+               y.lottype,
+               y.partid 
+          from rpt_tbl_stage_move Y
+WHERE 1=1 {0}
+         GROUP BY Y.RECORD_DATE, Y.STAGE,Y.lottype, y.partid) X order by X.STAGE
+";
+
+        public string listSQLHOLDWIP = @" SELECT X.STAGE as name,'HOLDQTY' series, nvl(X.HOLDQTY,0) value
+  FROM (select SUM(Y.MOVELOTQTY) AS MOVELOTQTY,
+               SUM(Y.HOLDQTY) AS HOLDQTY,
+               Y.RECORD_DATE ,
+               Y.STAGE,
+               y.lottype,
+               y.partid 
+          from rpt_tbl_stage_move Y
+WHERE 1=1 {0}
+         GROUP BY Y.RECORD_DATE, Y.STAGE,Y.lottype, y.partid) X order by X.STAGE
+";
+
+
+        public string listSQL = @"
+SELECT LOT.APPID,
+       hs.stepid,
+       hs.location,
+       -- hs.processoperation,
+       hs.processoperationid,
+       hs.stepseq,
+       hs.stagename,
+       FWh.Productid,
+       hs.trackinqty,
+       hs.trackoutqty,
+       fwte.capability,
+       lot.priority,
+       FWTE.Recipeid,
+       --   to_date(substr(hs.timeheresince,0,15),'yyyy-mm-dd hh24:mi:ss') as arrivetime,
+       --   to_date(substr(hs.trackintime,0,15),'yyyy-mm-dd hh24:mi:ss') as trackintime,
+       --   to_date(substr(hs.trackouttime,0,15),'yyyy-mm-dd hh24:mi:ss') as trackouttime,
+       round((to_date(substr(hs.trackintime, 0, 15), 'yyyymmdd hh24miss') -
+             to_date(substr(hs.timeheresince, 0, 15), 'yyyymmdd hh24miss')) * 1440,
+             2) queuetime,
+       round((to_date(substr(hs.trackouttime, 0, 15), 'yyyymmdd hh24miss') -
+             to_date(substr(hs.trackintime, 0, 15), 'yyyymmdd hh24miss')) * 1440,
+             2) runtime,
+       sum(round((nvl(to_date(substr(r.holdtime, 0, 15),
+                              'yyyymmdd hh24miss'),
+                      sysdate) - nvl(to_date(substr(hr.holdtime, 0, 15),
+                                              'yyyyMMdd HH24miss'),
+                                      sysdate)) * 1440,
+                 2)) HoldTime,
+       hr.reason,
+       hr.briefdescription,
+       @rowNumber, @recordCount
+
+  FROM fwwipstephistory hs
+  join fwlot lot on hs.lotobject = lot.sysid
+  left join fwhold hd on hd.wipstepref = hs.sysid
+  left join fwholdrelease hr on hd.holdrelease = hr.sysid
+  left join fwholdrelease r on hr.holdsysid = r.holdsysid
+                           and hr.sysid != r.sysid --release time
+  left join FwWipHistory FWH on hs.sysid = FWH.wipTxn
+  left join FWWIPTRANSACTION FWT on FWT.WipStepRef = HS.SYSID
+  left join FabWipTransactionExt FWTE on FWT.sysid = fwte.parent
+
+ @where   {0} 
+
+ group by LOT.APPID,
+          hs.stepid,
+          hs.location,
+          --   hs.processoperation,
+          hs.processoperationid,
+          hs.stepseq,
+          hs.stagename,
+          FWh.Productid,
+          hs.trackinqty,
+          hs.trackoutqty,
+          fwte.capability,
+          hs.timeheresince,
+          hs.trackintime,
+          hs.trackouttime,
+          lot.priority,
+          FWTE.Recipeid,
+          hr.reason,
+          hr.briefdescription
+ 
+";
+    }
+}

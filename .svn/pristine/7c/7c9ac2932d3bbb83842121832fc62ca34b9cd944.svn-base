@@ -1,0 +1,102 @@
+﻿@using EIP.Common.Entities
+@using EIP.Common.Entities.Dtos
+@using EIP.Web.DataUsers.Helpers
+
+@{
+    ViewBag.Title = "WIPProfile";
+    ViewBag.Require = "reporting-WIPProfile-WIPProfile";
+    Layout = "~/Views/Shared/_LayoutPageBaseList.cshtml";
+}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel-group" id="accordion">
+                <div class=" panel panel-primary">
+                    <div class="panel-heading text-center">
+                        <h3 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion"
+                               href="#condition">
+                                WIP Profile
+                            </a>
+                        </h3>
+                    </div>
+                    <div id="condition" class="panel-collapse collapse in">
+                        <div class="panel-body">
+                            <form class="form-horizontal">
+                                <div class="row">
+                                    <div class="col-lg-12">
+                                        <div class="row">
+                                            <div class="col-lg-6 form-group">
+
+                                                <div class="col-sm-2  ">
+                                                    <label class="control-label  ">Time Option:</label>
+                                                </div>
+                                                <div class="radio col-sm-2">
+                                                    <label>
+                                                        <input type="radio" name="ByDate" id="rdoUpToNow" value="1" class="manualfilter" checked>
+                                                        UpToNow
+                                                    </label>
+                                                </div>
+                                                <div class="radio col-sm-2">
+                                                    <label>
+                                                        <input type="radio" name="ByDate" id="Daliy" class="manualfilter"  value="2">
+                                                        Daliy
+                                                    </label>
+                                                </div>
+                                              <div class="col-sm-3  ">
+                                                    <input id="StartTime" type="text" name="StartTime" readonly disabled class="form-control manualfilter  " onfocus="WdatePicker({dateFmt:'yyyy-MM-dd',readOnly:true,isShowClear:false})" />
+                                                </div>   
+                                            </div>
+                                            <div class="col-lg-6 form-group">
+                                                <div class="col-sm-3  ">
+                                                    <label for="Part" class="control-label  ">Part:</label>
+                                                </div>
+                                                <div class="col-sm-6  ">
+                                                    <select id="selProduct" name="Product" class="form-control manualfilter select2"><option></option></select>
+                                                </div>
+                                               <div class="col-sm-6">
+                                                    <div class="checkbox">
+                                                        <label>
+                                                            <input id="IsIncludeEngLots" name="IsIncludeEngLots" type="checkbox" class="manualfilter">
+                                                               Include Eng Lots
+                                                        </label>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>     
+                                </div>
+                                <div class="row" style="padding-top:10px;">
+                                    <div class="col-lg-10"></div>
+                                    <div class="col-lg-2">
+                                        <div class="col-sm-6">
+                                            <input type="button" name="btn_select_box" value="搜 索" class="btn btn-primary pull-right" />
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <input type="button" name="btn_reset_box" value="重 置" class="btn  pull-right">
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="col-lg-12">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title"></h3>
+                    </div>
+                    <div class="panel-body" id="listpnlbody">
+                        <table id="list" class="grid"></table>
+                        <div id="pager"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

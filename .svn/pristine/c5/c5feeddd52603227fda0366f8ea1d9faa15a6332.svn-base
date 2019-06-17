@@ -1,0 +1,30 @@
+﻿using System;
+using System.Data;
+using System.Diagnostics;
+using System.Text;
+using Quartz;
+using System.Configuration;
+using System.Threading;
+using Common.Logging;
+using Common.Logging.Log4Net;
+
+namespace EIP.Job.Service.System
+{
+    /// <summary>
+    /// 数据库定时备份作业
+    /// </summary>
+    [DisallowConcurrentExecutionAttribute]
+    public class ReportJob : IJob
+    {
+        /// <summary>
+        /// 执行
+        /// </summary>
+        /// <param name="context"></param>
+        public void Execute(IJobExecutionContext context)
+        {
+            LogManager.GetLogger("ReportJob").Debug("Executed");
+        }
+
+        
+    }
+}

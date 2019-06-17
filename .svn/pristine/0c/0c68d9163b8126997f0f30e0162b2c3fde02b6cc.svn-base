@@ -1,0 +1,71 @@
+﻿@using EIP.Common.Entities
+@using EIP.Common.Entities.Dtos
+@using EIP.Web.DataUsers.Helpers
+
+@{
+    ViewBag.Title = "ProductIndices";
+    ViewBag.Require = "reporting-ProductIndices-queryScrapDetails";
+    Layout = "~/Views/Shared/_LayoutPageBaseList.cshtml";
+}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class=" panel panel-primary">
+                <div class="panel-body">
+                    <form class="form-inline form-horizontal">
+
+                        <div class="row" style="padding-top:10px;">
+                            <div class="col-lg-3">
+                                <div class="col-sm-4 text-right">
+                                    <label for="startDate" class="control-label text-right"><span class="need">*</span>日期:</label>
+                                </div>
+                                <div class="col-sm-8 text-left">
+                                    <input id="RECORD_DATE" type="text" name="RECORD_DATE" value="@ViewBag.date" readonly class="form-control manualfilter text-left" />
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="col-sm-4 text-right">
+                                    <label for="type" class="control-label text-right"><span class="need">*</span>Lot状态:</label>
+                                </div>
+                                <div class="col-sm-4 text-left">
+                                    <input id="ACTIVITY" type="text" name="ACTIVITY" value="@ViewBag.type" readonly class="form-control manualfilter text-left" />
+                                </div>
+
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="col-sm-4 text-right">
+                                    <label for="type" class="control-label text-right"><span class="need">*</span>LotType:</label>
+                                </div>
+                                <div class="col-sm-4 text-left">
+                                    <input id="PART" type="text" name="PART" value="@ViewBag.part" readonly class="form-control manualfilter text-left" />
+                                </div>
+                            </div>
+
+                            <div class="form-group pull-right">
+                                <div class="col-sm-6">
+                                    <input type="button" name="btn_select_box" value="搜 索" class="btn btn-primary pull-right" />
+                                </div>
+                                <div class="col-sm-6">
+                                    <input type="button" name="btn_reset_box" value="重 置" class="btn pull-right">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Scrap Details</h3>
+                </div>
+                <div class="panel-body" id="listpnlbody">
+                    <table id="list" class="grid"></table>
+                    <div id="pager"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

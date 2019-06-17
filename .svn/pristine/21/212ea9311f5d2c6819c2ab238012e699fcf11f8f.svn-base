@@ -1,0 +1,39 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using EIP.Common.Entities.Paging;
+using System.Data;
+
+namespace HiDM.Reporting.DataAccess
+{
+    public class WIPStatusRepository : ReportingRepository, IWIPStatusRepository
+    {
+
+        public PagedResults WIPStatus1(Models.WIPStatusInput input)
+        {
+            return base.PagingQueryDataTable(WIPStatusSQL, input);
+        }
+
+
+
+        private string WIPStatusSQL = @"select t.appid,
+       t.componentqty,
+       t.productname,
+       t.productrevision,
+       b.stepname,
+       b.stepseq,
+       b.steprevision,
+       b.processoperationID,
+       B.SUBPLANID,
+@rowNumber, @recordCount
+  from fwlot t
+  left join fwwipstep b on t.sysid = b.lotobject
+ WHERE T.PROCESSINGSTATUS IN ('Active', 'Hold')
+   AND T.PRODUCTNAME=:ProductName";
+
+
+        
+    }
+}

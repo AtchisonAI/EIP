@@ -1,0 +1,237 @@
+﻿using System;
+using System.Data;
+using System.Diagnostics;
+using System.Text;
+using EIP.Common.Core.Log;
+using EIP.Common.Dapper;
+using Quartz;
+using System.Configuration;
+using System.Threading;
+
+namespace EIP.Job.Service.System
+{
+    /// <summary>
+    /// 数据库定时备份作业
+    /// </summary>
+    [DisallowConcurrentExecutionAttribute]
+    public class ReportJob : IJob
+    {
+        /// <summary>
+        /// 执行
+        /// </summary>
+        /// <param name="context"></param>
+        public void Execute(IJobExecutionContext context)
+        {
+            StringBuilder logBuilder = new StringBuilder();
+            DateTime timeStart = DateTime.Now;
+            logBuilder.Append(timeStart);
+            logBuilder.Append(":开始执行Procedure【");
+            Stopwatch sw = new Stopwatch();
+            string procedureName = string.Empty;
+            sw.Start();
+            JobKey jobKey = context.JobDetail.Key;
+            // 获取传递过来的参数            
+            JobDataMap data = context.JobDetail.JobDataMap;
+            int errorCode = 0;
+            int maxRefireCount = 3;
+            int systemMaxRefireCount = 10;
+
+            try
+            {
+                string dbConnection = data.GetString("DBConnectionStringName");
+
+                DynamicParameters parameters = new DynamicParameters();
+                procedureName = data.GetString("ProcedureName");
+
+                logBuilder.Append(procedureName);
+                logBuilder.Append("】,数据库【");
+                logBuilder.Append(dbConnection);
+                logBuilder.Append("】,");
+
+                if (context.RefireCount > 0)
+                {
+                    logBuilder.Append("第【");
+                    logBuilder.Append(context.RefireCount);
+                    logBuilder.Append("】次重试\r\n");
+                }
+                else
+                {
+                    logBuilder.Append("\r\n");
+                }
+
+                if (data.Keys.Contains("MaxRetryCount"))
+                {
+                    string strMaxRefireCount = data.GetString("MaxRetryCount");
+                    int.TryParse(strMaxRefireCount, out maxRefireCount);
+                }
+
+                logBuilder.Append("Parameters:【");
+
+                SqlMapperUtil util = new SqlMapperUtil(dbConnection);
+                DateTime dateNow = util.GetCurrentDBTime();
+
+
+                foreach (var key in data.Keys)
+                {
+                    if (key.Contains("IN_"))
+                    {
+
+                        logBuilder.Append(key.Replace("IN_", string.Empty));
+                        logBuilder.Append(":");
+
+                        string value = data[key].ToString();
+                        if (value.Contains("$TODAY") || value.Contains("$CURRENTHOUR"))
+                        {
+                            DateTime dateInit = dateNow;
+                            DateTime dtResult = dateInit;
+
+                            if (value.Contains("$TODAY"))
+                            {
+                                dateInit = dateNow.Date;
+
+
+                            }
+                            else if (value.Contains("$CURRENTHOUR"))
+                            {
+
+                                dateInit = dateNow.Date.AddHours(dateNow.Hour);
+                            }
+
+                            string[] values = value.Split(new char[] { '_' });
+                            if (values.Length == 3)
+                            {
+                                double addtion = double.Parse(values[2]);
+
+                                if (values[1] == "HOUR")
+                                {
+                                    dtResult = dateInit.AddHours(addtion);
+                                }
+                                else if (values[1] == "DAY")
+                                {
+                                    dtResult = dateInit.AddDays(addtion);
+                                }
+                                else
+                                {
+                                    throw new Exception("Date Parameter format error【" + value + "】");
+                                }
+                            }
+                            else
+                            {
+                                throw new Exception("Date Parameter format error【" + value + "】");
+                            }
+
+                            parameters.Add(key.Replace("IN_", string.Empty), dtResult, dbType: DbType.DateTime);
+                            logBuilder.Append(dtResult);
+
+                        }
+                        else
+                        {
+                            parameters.Add(key.Replace("IN_", string.Empty), value);
+                            logBuilder.Append(value);
+                        }
+
+                        logBuilder.Append(";");
+
+                    }
+
+
+
+                }
+
+                logBuilder.Append("】\r\n");
+
+                parameters.Add("ErrorCode", dbType: DbType.Int32, direction: ParameterDirection.Output);
+                parameters.Add("ErrorMsg", dbType: DbType.String, direction: ParameterDirection.Output, size: 200);
+
+
+                util.ExcuteProcedure(procedureName, parameters);
+                errorCode = parameters.Get<int>("ErrorCode");
+                string errMsg = parameters.Get<string>("ErrorMsg");
+
+                if (errorCode != 0)
+                {
+
+                    logBuilder.Append(DateTime.Now + ": 结束执行Procedure【" + procedureName + "】发生错误, 错误信息：【" + errorCode + errMsg + "】\r\n");
+                    if (context.RefireCount < maxRefireCount)
+                    {
+                        logBuilder.Append("系统将在【30】秒后进行重试,");
+                        JobExecutionException e2 = new JobExecutionException();
+
+                        data.Put("denominator", "1");
+
+                        e2.RefireImmediately = true;
+
+                        throw e2;
+                    }
+                    else
+                    {
+                        logBuilder.Append("重试次数达到预设最大次数【" + maxRefireCount + "】，重试失败,");
+                    }
+                    //TODO 异常处理
+                }
+            }
+            catch (JobExecutionException ex)
+            {
+                if (context.RefireCount < systemMaxRefireCount)
+                {
+                    if (errorCode == 0)//代表非procedure报错
+                    {
+                        logBuilder.Append("系统将在【30】秒后进行重试,");
+                        Thread.Sleep(30000);
+
+                        data.Put("denominator", "1");
+
+                        ex.RefireImmediately = true;
+                        throw ex;
+                    }
+                    else
+                    {
+                        throw ex;
+                    }
+                }
+                else
+                {
+                    logBuilder.Append("重试次数达到系统预设最大次数【"+systemMaxRefireCount+"】，重试失败,");
+                    ex.UnscheduleFiringTrigger = true;
+                    throw ex;
+                }
+            }
+            catch (Exception ex)
+            {
+                logBuilder.Append(DateTime.Now + ": 结束执行Procedure【" + procedureName + "】发生错误,错误信息：【" + ex.StackTrace + "】,");
+                if (context.RefireCount < systemMaxRefireCount)
+                {
+                    logBuilder.Append("系统将在【30】秒后进行重试,");
+                    Thread.Sleep(30000);
+
+                    JobExecutionException e2 = new JobExecutionException();
+
+                    data.Put("denominator", "1");
+
+                    e2.RefireImmediately = true;
+                    throw e2;
+                }
+                else
+                {
+                    logBuilder.Append("重试次数达到系统预设最大次数【" + systemMaxRefireCount + "】，重试失败,");
+                    JobExecutionException e2 = new JobExecutionException();
+                    
+                    e2.UnscheduleFiringTrigger = true;
+                    throw e2;
+                }
+            
+            }
+            finally
+            {
+
+                sw.Stop();
+                LogWriter.WriteLog(FolderName.JobLog, logBuilder.Append("耗时【" + sw.ElapsedMilliseconds + "毫秒】").ToString(), timeStart);
+
+                Thread.Sleep(30000);
+            }
+
+        }
+
+        
+    }
+}

@@ -1,0 +1,94 @@
+﻿@using EIP.Common.Core.Config
+@using EIP.Common.Core.Utils
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>@GlobalParams.Get("loginTitle")</title>
+    @{
+    string path = UrlUtil.UrlConvertor();
+    }
+    <link href="@path/Contents/login.css" rel="stylesheet" />
+    <script src="@path/Scripts/lib/jquery-1.9.1.min.js"></script>
+    <script src="@path/Scripts/app/solution/account/login.js"></script>
+    <script src="@path/Scripts/resource/language_zh.js"></script>
+    <link href="@path/Scripts/lib/bootstrap/bootstrap.min.css" rel="stylesheet" />
+    <script src="@path/Scripts/lib/bootstrap/bootstrap.min.js"></script>
+</head>
+<body>
+    @*头部*@
+    <div id="header">
+        <div class="content">
+            <div class="announce">
+                @Html.Raw(GlobalParams.Get("loginTip"))
+            </div>
+        </div>
+        <div id="logo">
+            <img src="@GlobalParams.Get("loginlogo")" title="" style="margin-left: 50px" />
+        </div>
+    </div>
+    @*头部*@
+
+    @*主体*@
+    <div id="main">
+        @*背景滚动*@
+        <div id="funBoxBg">
+            <div id="funBox">
+                <div id="flashBg" style="background-attachment: scroll; background-position: 0% 0%; background-repeat: repeat no-repeat;">
+                    <div id="flashLine">
+                        <div id="flash"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        @*背景滚动*@
+
+        @*登录窗口*@
+        <div id="login">
+            <h1 style="text-align: center">@GlobalParams.Get("loginTitle")</h1>
+            @* <div style="color: red; text-align: center;font-size: 16px">登录用户名/密码均为:admin</div>*@
+            <div id="modLoginWrap" class="mod-qiuser-pop">
+                <div class="container" style="width:300px;">
+                    <form method="post" class="form-horizontal" name="frmLogin" id="loginForm">
+                        <!-- 用户名 -->
+                        <div class="row form-group">
+                            <label class="control-label" for="userCode">帐&nbsp;&nbsp; 号：</label>
+                            <input id="userCode" class="form-control" placeholder="User ID" type="text" name="userCode" />
+                        </div>
+                        <!-- 密码 -->
+                        <div class="row form-group">
+                            <label class="control-label" for="userPwd">密&nbsp;&nbsp; 码：</label>
+                            <input id="userPwd" placeholder="Password" class="form-control" type="password" name="userPwd" />
+                        </div>
+                        <div class="form-message"></div>
+                        <!-- 操作 -->
+                        <div class="row form-group text-center">
+                            <div class="btn-group" >
+                                <button type="button" class="btn btn-primary" id="btnSubmit" style="width:80px;">登录</button>
+                                <button type="button" class="btn btn-primary dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                                    <span class="caret"></span>
+                                    <span class="sr-only">Toggle Dropdown</span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><a href="#" id="loginAsTem">Login As Report User</a></li>
+                                </ul>
+                            </div>
+
+
+                            
+                            <input type="reset" class="btn" style="margin-left:30px;width:100px;" value="重置" id="btnClear">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        @*登录窗口*@
+    </div>
+    @*主体*@
+
+    @*底部说明信息*@
+    <div id="footer">
+        @Html.Raw(GlobalParams.Get("loginBottomDescription"))
+    </div>
+</body>
+</html>

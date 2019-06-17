@@ -1,0 +1,73 @@
+﻿@using EIP.Common.Entities
+@using EIP.Common.Entities.Dtos
+@using EIP.Web.DataUsers.Helpers
+
+@{
+    ViewBag.Title = "Hold lot history";
+    ViewBag.Require = "reporting-coder-holdlothistory";<!--这里是注释不会在页面中显示，此处定义view使用的js文件，reporting-employinfo与实际的js文件名的映射关系在scripts/page.js中指定-->
+    Layout = "~/Views/Shared/_LayoutPageBaseList.cshtml";
+}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class=" panel panel-primary">
+            <div class="panel-heading text-center">
+                <h3 class="panel-title">Hold Lot History</h3>
+                   
+            </div>
+            <div class="panel-body">
+                <form class="form-inline  form-horizontal">
+                    <div class="form-group">
+                        <label for="Begindate" class="control-label col-sm-6">Begin date(开始日期):</label>
+                        <div class="col-sm-6">
+                            <input type="date" name="begin_date" class="form-control manualfilter" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="Enddate" class="control-label col-sm-6">End date(结束日期):</label>
+                        <div class="col-sm-6">
+                            <input type="date" name="End_date" class="form-control manualfilter" />
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label for="Analysisunit" class="control-label col-sm-7">分析单位:</label>
+                        <div class="col-sm-5 text-left">
+                            <select id="unit" name="unit" class="form-control manualfilter select2">
+                                <option value="1 "> lot </option>
+                                <option value="2 "> wafer </option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="form-group pull-right">
+                        <div class="col-sm-6">
+                            <input type="button" name="btn_select_box" value="搜 索" class="btn btn-primary pull-right" />
+                        </div>
+                        <div class="col-sm-6">
+                            <input type="button" name="btn_reset_box" value="重 置" class="btn pull-right">
+                        </div>
+                    </div>
+                </form>
+            </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Hold lot summary</h3>
+                </div>
+                <div class="panel-body" id="chartpnlbody">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="list" id="listhide">
+    <table id="list"></table>
+    <div id="pager"></div>
+</div>

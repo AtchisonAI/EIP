@@ -1,0 +1,25 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace HiDM.Reporting.Models
+{
+   public  class BaseHoldInfo
+    {
+        public string LotID { get; set; }
+
+
+        public string HoldReason { get; set; }
+
+        public string CarrierID { get; set; }
+
+        public string HoldType { get; set; }
+
+        public bool Result { get; set; }
+
+        public string ErrorMsg { get; set; }
+       
+    }
+}

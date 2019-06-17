@@ -1,0 +1,71 @@
+﻿@using EIP.Common.Entities
+@using EIP.Common.Entities.Dtos
+@using EIP.Web.DataUsers.Helpers
+
+@{
+    ViewBag.Title = "Hold lot history detail Information";
+    ViewBag.Require = "reporting-holdlothistorydetailinfo";<!--这里是注释不会在页面中显示，此处定义view使用的js文件，reporting-employinfo与实际的js文件名的映射关系在scripts/page.js中指定-->
+    Layout = "~/Views/Shared/_LayoutPageBaseList.cshtml";
+}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class=" panel panel-primary">
+                <div class="panel-body">
+                    <form class="form-inline  form-horizontal">
+                        <div class="form-group">
+                            <label for="Module" class="control-label  col-sm-5">Module:</label>
+                            <div class="col-sm-7">
+                                @Html.DropDownListSQL(new DropDownListSQLInput
+                                {
+                                ConnectionString = "HiDM.Reporting.DataAccess",
+                                SQL = "SELECT DEPT_CODE VALUE, DEPT_NAME NAME FROM EMP GROUP BY DEPT_CODE,DEPT_NAME",
+                                Name = "ModuleCode",
+                                NeedDefault = true,
+                                HtmlAttributes = new { @class = "form-control manualfilter" }
+                                })
+
+                                <input type="text" id="moduleHidden" value="@ViewBag.ModuleCode" hidden />
+                            </div>
+                        </div>
+                        <div class="form-group pull-right">
+                            <div class="col-sm-6">
+                                <input type="button" name="btn_select_box" value="搜 索" class="btn btn-primary pull-right" />
+                            </div>
+                            <div class="col-sm-6">
+                                <input type="button" name="btn_reset_box" value="重 置" class="btn pull-right">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Hold lot history Details</h3>
+                </div>
+                <div class="panel-body" id="listpnlbody">
+                    <table id="list" class="grid"></table>
+                    <div id="pager"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Hold lot summary</h3>
+                </div>
+                <div class="panel-body" id="chartpnlbody">
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

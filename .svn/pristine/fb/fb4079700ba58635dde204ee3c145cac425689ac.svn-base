@@ -1,0 +1,107 @@
+﻿define(['reportingbootstrap'],
+    function (abc) {
+        initGird();
+        size = UtilWindowHeightWidth();
+    });
+
+//var chartDictionary;
+
+function windowResized() {
+    //if (chartDictionary != 'undefined') {
+    //    for (var key in chartDictionary) {
+    //        chartDictionary[key].resize();
+    //    }
+    //}
+}
+
+//初始化表格
+function initGird() {
+    $grid = $("#list").jgridview(
+        {
+            datatype: "json",
+            multiselect: true,
+            loadonce: false,
+            shrinkToFit: true,
+            url: '/Reporting/HoldLotHistory/QueryHoldLotHistory',
+            colModel: [
+                //假的grid并且隐藏 
+                { label: "Lot type", name: "LOTTYPE", index: "LOTTYPE", width: 130, fixed: true },
+                { label: "Area", name: "AREA", index: "AREA", width: 130, fixed: true },
+                { label: "Product id", name: "PRODUCTID", index: "PRODUCTID", width: 130, fixed: true },
+                { label: "Lot ID", name: "LOTID", index: "LOTID", width: 130, fixed: true },
+                { label: "Stage name", name: "STAGENAME", index: "STAGENAME", width: 130, fixed: true },
+                { label: "Step seq", name: "STEPSEQ", index: "STEPSEQ", width: 50, fixed: true },
+                { label: "Step name", name: "STEPNAME", index: "STEPNAME", width: 160, fixed: true },
+                { label: "Eqp id", name: "EQID", index: "EQID", width: 130, fixed: true },
+                { label: "Priority", name: "PRI", index: "PRI", width: 50, fixed: true },
+                { label: "Quantity", name: "QTY", sortable: false, width: 130, fixed: true },
+                { label: "Hold owner", name: "HOLDUSER", index: "HOLDUSER", width: 130, fixed: true },
+                { label: "Hold module", name: "HOLDMODULE", index: "HOLDMODULE", width: 130, fixed: true },
+                { label: "holdtime", name: "REP_EMPNO", index: "REP_EMPNO", width: 130, fixed: true },
+                { label: "Lastholdtime", name: "LASTHOLDTIME", index: "LASTHOLDTIME", width: 130, fixed: true },
+                { label: "Hold code", name: "HOLDCODE", index: "HOLDCODE", align: "center", fixed: true, width: 130 },
+                { label: "Hold comment", name: "HOLDCOMMENT", align: "center", fixed: true, width: 130 },
+                { label: "Release owner", name: "RELEASEUSER", index: "RELEASEUSER", align: "center", fixed: true, width: 130 },
+                { label: "Releaseuser Module", name: "RELEASEUSERMODULE", index: "RELEASEUSERMODULE", align: "center", fixed: true, width: 130 },
+                { label: "Release time", name: "RELEASETIME", index: "RELEASETIME", align: "center", fixed: true, width: 130 },
+                { label: "Hold qtime", name: "HOLDQTIME", index: "HOLDQTIME", align: "center", fixed: true, width: 130 }
+            ],
+            sortname: "lotid",
+            height: 200,
+            sortorder: "asc",
+            loadComplete: function (json) {
+                if (json.rows.length > 0) {
+                    initFillChart(json.ExtraDatas.Summary)
+                }
+            }
+        });
+    $("#listhide").hide();
+}
+
+/*function initFillChart(data) {
+    var rowdiv;
+    $.each(data, function (i, item) {
+        if (i % 3 === 0) {
+            rowdiv = $('<div class="row"></div>');
+            $('#chartpnlbody').append(rowdiv);
+        }
+        var childdiv = $('<div class="col-lg-4"><div onclick="popDetailInfo(\''+item.title.text+'\')" id="'+ item.title.text+'" style="height:300px;" class="chart"><div></div>');
+        rowdiv.append(childdiv);
+
+        //初始化chart；
+        var chart = echarts.init(document.getElementById(item.title.text));
+        chart.setOption(item);
+    });
+
+    $charts = $('.chart');
+}*/
+
+function initFillChart(data) {
+    var rowdiv;
+    var width;
+    var interval;
+    if (data.length >= 3) {
+        interval = 4;
+    } else {
+        interval = 12 / data.length;
+    }
+    $.each(data, function (i, item) {
+        if (i % 3 === 0) {
+            rowdiv = $('<div class="row"></div>');
+            $('#chartpnlbody').append(rowdiv);
+            width = rowdiv.width();
+        }
+        var childdiv = $('<div class="col-lg-' + interval + '"><div onclick="popDetailInfo(\'' + item.title.text + '\')" id="' + item.title.text + '" style="height:300px;" class="chart"><div></div>');
+        rowdiv.append(childdiv);
+
+        //初始化chart；
+        chart = echarts.init(document.getElementById(item.title.text));
+        chart.setOption(item);
+    });
+
+    $charts = $('.chart');
+}
+
+function popDetailInfo(moduleCode) {
+    ArtDialogOpen("/Reporting/HoldLotHistoryDetailInfo/HoldLotHistoryDetail?moduleCode=" + moduleCode, "Hold lot History detail-" + moduleCode, true, 900, 1440, true);
+}

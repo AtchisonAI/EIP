@@ -1,0 +1,119 @@
+﻿define(['reportingbootstrap'],
+    function (abc) {
+        initSelect();
+        initGird();
+        //initGirdAdd();
+        size = UtilWindowHeightWidth();
+        
+    });
+
+function ValidateInput() {
+  //  alert($('#selProductID').val());
+    
+    if ($('#StartTime').val() == '') {
+        DialogTipsMsgError('请输入StartTime!', 5000);
+        $('#StartTime').focus();
+        return false;
+    }
+    if ($('#EndTime').val() == '') {
+        DialogTipsMsgError('请输入EndTime!', 5000);
+        $('#EndTime').focus();
+        return false;
+    }
+    return true;
+}
+
+function initSelect() {
+
+    $("#selTechID").select2({
+        language: "zh-CN", //设置 提示语言
+        width: "100%", //设置下拉框的宽度
+        placeholder: "请单击或输入数据过滤，选择TECH.ID！",
+        maximumSelectionLength: 2,  //设置最多可以选择多少项
+        multiple: true,//设置是否可以多选
+        allowClear: true,//允许清空
+        ajax: {
+            url: "/Common/Common/QueryTechIDSelectList",// /Common 文件夹名，/common controllers名字，/query..方法名字 获取数据的地址
+            dataType: 'json',
+            delay: 250,//按键之后多久才提交后台进行查询
+            data: function (params) {//查询参数
+                return {
+                    selTechID: params.term,//获取输入作为productfamily，提交后台
+                    page: params.page || 1//当前页数
+                };
+            },
+            processResults: function (result, params) {//获取到后台数据后，进行解析
+                params.page = params.page || 1;
+                if (result.isSuccess) {
+                    return {
+                        results: result.data,
+                        pagination: {
+                            more: (params.page * 10) < result.totalCount//分页条件：当前已显示数量<总数
+                        }
+                    };
+                } else {
+                    return {
+                        results: null
+                    };
+                }
+            },
+            cache: true
+        },
+        escapeMarkup: function (markup) { return markup; } // let our custom formatter work
+        //minimumInputLength: 1
+    });
+}
+
+
+    var size; //宽高
+
+
+    function loadGraph(data) {
+
+        myChart.setOption(data);
+
+    }
+
+    //初始化表格
+    function initGird() {
+        $grid = $("#list").jgridview(
+            {
+                datatype: "local",
+                multiselect: false,
+                loadonce: false,
+                shrinkToFit: true,
+                url: '/Reporting/ProductIndices/QueryInfo',
+                colModel: [
+                    { label: "Date", name: "RECORD_DATE", width: 200, fixed: true },
+                    { label: "Lottype", name: "LOTTYPE", width: 200, fixed: true },
+                    { label: "BOH", name: "BOH", width: 200, fixed: true },
+                    { label: "Move(Lot)", name: "MOVELLOTQTY", width: 200, fixed: true },
+                    { label: "Move(Wafer)", name: "MOVEWAFERQTY", width: 200, fixed: true },
+                    {
+                        label: "Strat", name: "WAFERSTARTQTY", width: 200, fixed: true, formatter: function (cellValue, options, rowdata, action) {
+                            return "<a herf='javascript:(0)' onclick='showDetails(\"" + rowdata.RECORD_DATE + "\")' ><font color='blue'><u>" + rowdata.WAFERSTARTQTY + "</u></blue></a>";
+                        }
+                    },
+                    { label: "Out", name: "SHIPQTY", width: 200, fixed: true },
+                    { label: "Unship", name: "UNSHIPQTY", width: 200, fixed: true },
+                    { label: "BankIn", name: "BANKINQTY", width: 200, fixed: true },
+                    { label: "BankOut", name: "BANKOUTQTY", width: 200, fixed: true },
+                    { label: "Scrap", name: "SCRAPQTY", width: 200, fixed: true },
+                    { label: "UnScrap", name: "UNSCRAPQTY", width: 200, fixed: true },
+                    { label: "Yield", name: "YIELD", width: 200, fixed: true },
+                    { label: "Hold", name: "HOLDQTY", width: 200, fixed: true },
+                    { label: "Rework", name: "REWORKQTY", width: 200, fixed: true }
+            
+                ],
+                sortname: "RECORD_DATE",
+                height: '580px',
+                sortorder: "asc",
+                additionalLoadCompleteAction: function (json) {
+
+                }
+            });
+    }
+
+function showDetails(RECORD_DATE) {
+    ArtDialogOpen("/Reporting/ProductIndices/StartDetails?date=" + RECORD_DATE + "&type=P", "StartDetails-" + RECORD_DATE, true, 750, 1200, true);
+    }

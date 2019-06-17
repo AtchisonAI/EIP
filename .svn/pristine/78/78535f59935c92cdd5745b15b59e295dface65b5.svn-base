@@ -1,0 +1,94 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using EIP.Common.Entities.Paging;
+using System.Data;
+using System.Globalization;
+
+
+namespace HiDM.Reporting.DataAccess
+{
+    public class ProductIndicesRepository : ReportingRepository, IProductIndicesRepository
+    {
+        public PagedResults GetQueryInfoList(Models.ProductIndicesInput InfoInput)
+        {
+            return base.PagingQueryDataTable(listSQL, InfoInput);
+        }
+
+
+        private string listSQL = @"SELECT  RECORD_DATE,
+                                           LOTTYPE,
+                                           BOH,
+                                           MOVELLOTQTY,
+                                           MOVEWAFERQTY,
+                                           WAFERSTARTQTY,
+                                           SHIPQTY,
+                                           UNSHIPQTY,
+                                           BANKINQTY,
+                                           BANKOUTQTY,
+                                           SCRAPQTY,
+                                           UNSCRAPQTY,
+                                           YIELD,
+                                           HOLDQTY,
+                                           REWORKQTY,
+                                           @rowNumber,
+                                           @recordCount
+                                      FROM RPT_TBL_PART_INFO
+                                     WHERE   TO_DATE(RECORD_DATE, 'yyyymmdd') BETWEEN
+                                           TO_DATE(:StartTime, 'yyyymmdd') AND TO_DATE(:EndTime, 'yyyymmdd')
+                                       AND LOTTYPE = 'P'";
+
+
+
+        public PagedResults GetStartDetails(Models.StartDetailsInput InfoInput)
+        {
+            DateTime dt;
+            string filter1 = string.Empty;
+            string filter2 = string.Empty;
+            string filter = string.Empty;
+
+            filter1 = InfoInput.RECORD_DATE;
+           
+            DateTimeFormatInfo dtFormat = new DateTimeFormatInfo();
+
+            dtFormat.ShortDatePattern = "yyyy/MM/dd";
+
+            filter2 = Convert.ToDateTime(filter1.Substring(0, 4) + '/' + filter1.Substring(4, 2) + '/' 
+                                + filter1.Substring(6, 2), dtFormat).AddDays(1).ToShortDateString().Replace("/","");
+           
+
+            //filter2 = filter1 + 1;
+            filter1 = filter1 + "080000";
+            filter2 = filter2 + "080000";
+            filter = "And replace(SUBSTR(HS.TXNTIMESTAMP, 0, 15),' ','') between " + "\'"+ filter1 + "\'" + " and " + "\'" + filter2 +"\'" ;
+            string sql = string.Format(StartDetailsSQL, filter);
+            return base.PagingQueryDataTable(sql, InfoInput);
+        }
+
+        private string StartDetailsSQL = @"SELECT 
+                                               HS.WIPID LOT_ID,
+                                               LOT.LOTTYPE LOT_TYPE,
+                                               LOT.PRIORITY PRIORITY,
+                                               '0' PARENT_ID,
+                                               LOT.PRODUCTNAME|| '.' || PRODUCTREVISION    PART_ID,
+                                               HS.USERID EVENT_USER,
+                                               HS.TXNTIMESTAMP EVENT_TIME,
+                                               HS.LOTQTYOUT START_QTY,
+                                               @rowNumber, @recordCount
+                                          FROM FWWIPTRANSACTION HS
+                                          LEFT JOIN FWLOT LOT ON HS.LOTOBJECT = LOT.SYSID
+                                          LEFT JOIN FWWIPSTEPHISTORY WS ON LOT.SYSID = WS.LOTOBJECT
+                                                                       AND WS.SYSID = HS.WIPSTEPREF
+                                          LEFT JOIN FWSCRAPLOT SL ON LOT.SYSID = SL.LOTOBJECT
+                                                                 AND SL.SYSID = HS.WIPSTEPREF
+                                         WHERE  LOT.LOTTYPE != 'CAR'
+                                           AND LOT.LOTTYPE != 'Material'
+                                           AND HS.ACTIVITY = 'LotStart' {0} ";
+
+                                                     
+    }
+
+
+}

@@ -1,0 +1,79 @@
+﻿using EIP.Common.Entities.ECharts;
+using EIP.Common.Entities.Paging;
+using HiDM.Reporting.Business;
+using HiDM.Reporting.DataAccess;
+using HiDM.Reporting.Models;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace HiDM.Reporting.Business
+{
+    class HoldLotHistoryLogic : IHoldLotHistoryLogic
+    {
+        private IHoldLotHistoryRepository iHoldLotHistoryRepository;
+
+        public HoldLotHistoryLogic(IHoldLotHistoryRepository holdLotHistoryRepository)
+        {
+            iHoldLotHistoryRepository = holdLotHistoryRepository;
+        }
+        public Task<PagedResults> QueryHoldLotHistoryListAsync(HoldLotHistoryInput input)
+        {
+            throw new NotImplementedException();
+        }
+
+        public PagedResults QueryHoldLotHistoryListSync(HoldLotHistoryInput input)
+        {
+            var pageResults = iHoldLotHistoryRepository.GetHoldlotHistroyListSync(input);
+            List<ChartOption> optionList = new List<ChartOption>();
+
+            if (string.IsNullOrWhiteSpace(input.moduleCode))
+            {    
+                //not specify module code,add each module summary data
+                GetModuleListInput moduleInput = new GetModuleListInput();
+                DataTable moduleTB = iHoldLotHistoryRepository.GetModuleListSync(moduleInput);
+                HoldLotHistoryInput moduleSummaryInput = new HoldLotHistoryInput();
+                string modulecode;
+                foreach (DataRow dr in moduleTB.Rows)
+                {
+                    modulecode = dr["value"].ToString();
+                    if(!string.IsNullOrWhiteSpace(modulecode))
+                    {
+                        moduleSummaryInput.moduleCode = modulecode;
+                        optionList.Add(GetSummaryOption(moduleSummaryInput));
+                    }
+                }
+            }
+
+            //if  module not specified add all fab data,if sepcified add the specified module summary data
+            if (1 == string.Compare(input.moduleCode,"Fab"))
+            {
+                input.moduleCode = " ";
+            }
+            optionList.Add(GetSummaryOption(input));
+            pageResults.ExtraDatas.Add("Summary", optionList);
+
+            return pageResults;
+        }
+
+        private ChartOption GetSummaryOption(HoldLotHistoryInput input)
+        {
+            var summaryData = iHoldLotHistoryRepository.GetHoldLotHistorySummarySync(input);
+            var percentData = iHoldLotHistoryRepository.GetHoldLotHistoryPercentSync(input);
+
+            string chartTitle = input.moduleCode;
+            if (string.IsNullOrWhiteSpace(input.moduleCode))
+            {
+                chartTitle = "Fab";
+            }
+
+            ChartOption optionSummary = summaryData.ToChartOption(ChartType.Bar, chartTitle, "", "name", "Series", "value", "HoldLotHist", ChartDirection.Vertical);
+            ChartOption addtionOption = percentData.AddToChartOption(optionSummary, ChartType.Line, "name", "Series", "value", " ");
+            addtionOption.title.x = "left";
+            return addtionOption;
+        }
+    }
+}

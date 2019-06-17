@@ -1,0 +1,72 @@
+﻿@{
+    ViewBag.Title = "调度任务编辑";
+    ViewBag.Require = "rpt-tbljobconfig-edit";
+    Layout = "~/Views/Shared/_LayoutPageEditSubmit.cshtml";
+}
+@using EIP.Common.Entities.Dtos
+@using EIP.Web.DataUsers.Helpers
+@model HiDM.Reporting.Models.JobConfig.RPTTBLJOBCONFIG
+@Html.EditTopRemark(new EditTopRemarkInput()
+{
+    Title = "菜单按钮信息",
+    Remark = "注：带*号的为必填信息！"
+})
+<script src="~/Scripts/lib/jquery-1.7.2.min.js"></script>
+@*easyui*@
+<link href="~/Scripts/lib/easyui/themes/default/easyui.css" rel="stylesheet" />
+<link href="~/Scripts/lib/easyui/themes/icon.css" rel="stylesheet" />
+<script src="~/Scripts/lib/easyui/jquery.easyui.min.js"></script>
+<div class="edit-content">
+    <table class="complex-table">
+        <tbody>
+            <tr>
+                <th style="width: 200px" class="m">Procedure Name：</th>
+                <td>
+                    @Html.HiddenFor(f => Model.SYSID)
+                    @Html.TextBoxFor(f => Model.PROCEDURENAME, new { datatype = "*1-150" })
+                </td>
+
+            </tr>
+            <tr>
+                <th class="m">Sequence：</th>
+                <td>
+                    @Html.TextBox("SEQUENCE", @Model.SEQUENCE, new { })
+                </td>
+            </tr>
+            <tr>
+                <th class="m">Trigger Type：</th>
+                <td>
+                    @Html.DropDownListDictionary(new DropDownListDictionaryInput
+                    {
+                    Id = "TRIGGER_TYPE",
+                    Name = "TRIGGER_TYPE",
+                    Code = "JOBTriggerType",
+                    NeedDefault = false,
+                    SelectedVal = @Model.TRIGGER_TYPE,
+                    HtmlAttributes="datatype = '*'"
+                    })
+                </td>
+            </tr>
+            <tr>
+                <th class="m">Max Retry Count：</th>
+                <td>
+                    @Html.TextBox("MAX_RETRY_COUNT", @Model.MAX_RETRY_COUNT, new { })
+                </td>
+            </tr>
+            <tr>
+
+                <th class="m">Is Stop When Failed：</th>
+                <td>
+                    @Html.CheckBox("IS_STOP_WHEN_FAILED", @Model.IS_STOP_WHEN_FAILED)
+                </td>
+            </tr>
+    </table>
+</div>
+@Html.EditTopRemark(new EditTopRemarkInput()
+{
+    Title = "Job参数"
+})
+<div class="edit-content" style="border: none">
+    <table id="list"></table>
+    <div id="pager"></div>
+</div>

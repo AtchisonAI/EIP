@@ -1,0 +1,43 @@
+﻿define(['reportingbootstrap'],
+    function (abc) {
+        initGird();
+        size = UtilWindowHeightWidth();
+        if ($('#HOLDRELEASE').val() !== '') {
+            $("[name='btn_select_box']").click();
+        }
+        
+    });
+
+var $grid,
+    size; //宽高
+
+
+function ValidateInput() {
+  
+    return true;
+}
+
+//初始化表格
+function initGird() {
+    $grid = $("#list").jgridview(
+        {
+            datatype: "local",
+            multiselect: false,
+            loadonce: false,
+            shrinkToFit: true,
+            url: '/Reporting/LotHistory/QueryLotHoldHistoryInfo',
+            colModel: [
+                { label: "Hold Time", name: "HOLDTIME",width: 130, fixed: true },
+                { label: "Release Time", name: "RELEASETIME",width: 130, fixed: true },
+                { label: "Sponsor", name: "COMMENTCODE",width: 130, fixed: true },
+                { label: "Hold Code", name: "HOLDCODE",width: 130, fixed: true },
+                { label: "Hold reasion", name: "BRIEFDESCRIPTION",width:330, fixed: true },
+               ],
+            sortname: "FHR.HOLDTIME",
+            height: '500px',
+            sortorder: "desc",
+            additionalLoadCompleteAction: function (json) {
+            }
+        });
+}
+

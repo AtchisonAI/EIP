@@ -1,0 +1,93 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using EIP.Common.Entities.Paging;
+using System.Data;
+
+namespace HiDM.Reporting.DataAccess
+{
+    public class ZhangLuRepository : ReportingRepository, IZhangLuRepository
+    {
+
+        public PagedResults GetLotHistory(Models.ZhangLuInput input)
+        {
+            return base.PagingQueryDataTable(lotHistorySQL, input);
+        }
+
+
+        public PagedResults GetLotHoldHistory(Models.HoldReleaseInput input)
+        {
+            return base.PagingQueryDataTable(lotHoldHistorySQL,input);
+        }
+
+
+
+        private string lotHistorySQL = @"SELECT hs.stepid,
+       hs.location,
+       hs.stepseq,
+       hs.stagename,
+       FWh.Productid,
+       fwh.lottype,
+       fwte.capability,
+       hd.lotqtyin,
+       lot.priority,
+       to_date(substr(hs.timeheresince,0,15),'yyyy-mm-dd hh24:mi:ss') as arrivetime,
+       to_date(substr(hs.trackintime,0,15),'yyyy-mm-dd hh24:mi:ss') as trackintime,
+       to_date(substr(hs.trackouttime,0,15),'yyyy-mm-dd hh24:mi:ss') as trackouttime,
+       round((to_date(substr(hs.trackintime, 0, 15), 'yyyymmdd hh24miss') -
+             to_date(substr(hs.timeheresince, 0, 15), 'yyyymmdd hh24miss')) * 1440,
+             2) queuetime,
+       round((to_date(substr(hs.trackouttime, 0, 15), 'yyyymmdd hh24miss') -
+             to_date(substr(hs.trackintime, 0, 15), 'yyyymmdd hh24miss')) * 1440,
+             2) runtime,
+       sum(round((nvl(to_date(substr(r.holdtime, 0, 15),
+                              'yyyymmdd hh24miss'),
+                      sysdate) - nvl(to_date(substr(hr.holdtime, 0, 15),
+                                              'yyyyMMdd HH24miss'),
+                                      sysdate)) * 1440,
+                 2)) HoldTime,
+  hd.holdrelease,
+  @rowNumber, @recordCount
+  FROM fwwipstephistory hs
+  join fwlot lot on hs.lotobject = lot.sysid
+  left join fwhold hd on hd.wipstepref = hs.sysid
+  left join fwholdrelease hr on hd.holdrelease = hr.sysid
+  left join fwholdrelease r on hr.holdsysid = r.holdsysid
+                           and hr.sysid != r.sysid   --release time
+  left join FwWipHistory FWH on hd.sysid = FWH.wipTxn
+  left join FabWipTransactionExt FWTE on hd.sysid = fwte.parent
+@where and lot.appid = :LotID
+group by hs.stepid,
+          hs.stepseq,
+          hs.location,
+          hs.stagename,
+          hs.location,
+          FWh.Productid,
+          fwh.lottype,
+          fwte.capability,
+          hd.lotqtyin,
+          lot.priority,
+          hs.timeheresince,
+          hs.trackintime,
+          hs.trackouttime,
+          hd.holdrelease";
+
+
+        private string lotHoldHistorySQL = @"select to_date(substr(FHR.HOLDTIME, 0, 15), 'yyyy-mm-dd hh24:mi:ss') as HOLDTIME,
+       --FHR.HOLDTIME,
+       to_date(substr(fhrr.holdtime, 0, 15), 'yyyy-mm-dd hh24:mi:ss') as releasetime,
+       --fhrr.holdtime as releasetime,
+       FHR.COMMENTCODE,
+       FHR.REASON AS holdcode,
+       FHR.BRIEFDESCRIPTION,
+       FHR.holdsysid,
+@rowNumber, @recordCount
+  from fwholdrelease FHR
+  LEFT JOIN fwhold FWHOLD ON FWHOLD.holdrelease = FHR.HOLDSYSID
+  LEFT JOIN fwholdrelease FHRR on fhr.holdsysid = fhrr.holdsysid
+ WHERE FHR.COMMENTCODE != '-'
+   and fhrr.sysid != fhr.sysid and FHR.SYSID=:HOLDRELEASE";
+    }
+}

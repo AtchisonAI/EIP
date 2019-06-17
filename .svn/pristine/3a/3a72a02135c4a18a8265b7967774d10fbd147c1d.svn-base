@@ -1,0 +1,123 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using EIP.Common.Entities.Paging;
+using System.Data;
+
+namespace HiDM.Reporting.DataAccess
+{
+    public class XuTaoRepository : ReportingRepository, IXuTaoRepository
+    {
+
+        public PagedResults GetLotHistory(Models.LotHistoryInput input)
+        {
+            return base.PagingQueryDataTable(lotHistorySQL, input);
+        }
+
+        public PagedResults GetLotInfoList(Models.XuTaoInput input)
+        {
+            string filter = string.Empty;
+            if (input.ProductName !=null && input.ProductName.Length > 0)
+            {
+                filter = string.Format("AND ProductName IN ('{0}') ", input.ProductName);
+            }
+
+            string sql = string.Format(listSQL, filter);
+            return base.PagingQueryDataTable(sql, input);
+        }
+
+        public DataTable GetLotStatusSummary(Models.XuTaoInput input)
+        {
+            string filter = string.Empty;
+            if (input.ProductName != null && input.ProductName.Length > 0)
+            {
+                filter = string.Format("AND ProductName IN ('{0}') ",input.ProductName);
+            }
+
+            string sql = string.Format(summaySQL, filter);
+
+            return base.QueryDataTable(sql, "Summary");
+        }
+
+        private string lotHistorySQL = @"select W.sysId,
+       W.activity,
+       W.txnTimeStamp,
+       WSH.stepId,
+       SX.description,
+       WSH.handle,
+       WH.lotQuantity,
+       WSH.resourceType,
+       decode(substr(W.sysId, 1, 8),
+              '00000e82',
+              WSH.trackInLocation,
+              WSH.location) Equipment,
+       W.userId,
+       WH.lotType,
+       WH.planId,
+       WX.subPlanId,
+       WH.productId,
+       WH.area area,
+       WH.currentsite tunnelId,
+       WX.recipeId,
+       WX.reticleId,
+       WX.edcPlanId,
+       W.wipId,
+       C.briefdescription,       
+       @rowNumber, @recordCount
+  from fwlot                lot,
+       FwWipTransaction     W,
+       FwWipHistory         WH,
+       FwWipStepHistory     WSH,
+       FwComment            C,
+       FabWipTransactionExt WX,
+       FwStepVersion        SV,
+       FwExtStepSpec        SX
+ @where AND lot.APPID = :LotID
+   AND lot.sysid = W.lotObject(+)
+   and W.sysId = WH.wipTxn(+)
+   and W.wipStepRef = WSH.sysId(+)
+   and W.txnComment = C.sysId(+)
+   and W.sysId = WX.parent(+)
+   and substr(WSH.stepId, 1, instr(WSH.stepId, '.') - 1) = SV.stepname(+)
+   and substr(WSH.stepId, instr(WSH.stepId, '.') + 1, length(WSH.stepId)) =
+       SV.revision(+)
+   and SV.sysid = SX.parent(+)
+";
+
+
+        private string listSQL = @"SELECT LOT.APPID LOTID,
+       PLANNAME,
+       PRODUCTNAME,
+       FWS.CURRENTQTY QTY,
+       STAGENAME,
+       LOT.TRANSPORTID CARRIERID,
+       STEPNAME,
+       PROCESSINGSTATUS,
+       EXTRASTATUS,       
+       @rowNumber, @recordCount
+  FROM FWLOT LOT
+  LEFT JOIN FABLOTEXT LOTEXT ON LOT.SYSID = LOTEXT.PARENT
+  LEFT JOIN FWWIPSTEP FWS
+  ON LOT.SYSID = FWS.LOTOBJECT
+ @where AND LOT.LOTTYPE <> 'CAR'
+   AND LOT.LOTTYPE <> 'Material'
+   AND PLANNAME IS NOT NULL
+   AND PROCESSINGSTATUS <> 'Terminated'
+   {0}";
+
+        private string summaySQL = @"SELECT PRODUCTNAME Series,COUNT(*) CNT,EXTRASTATUS STATUS
+            FROM FWLOT LOT
+  LEFT JOIN FABLOTEXT LOTEXT ON LOT.SYSID = LOTEXT.PARENT
+  LEFT JOIN FWWIPSTEP FWS
+  ON LOT.SYSID = FWS.LOTOBJECT
+WHERE LOT.LOTTYPE <> 'CAR'
+   AND LOT.LOTTYPE <> 'Material'
+   AND PLANNAME IS NOT NULL
+   AND PROCESSINGSTATUS <> 'Terminated'
+   {0}
+   GROUP BY EXTRASTATUS,PRODUCTNAME";
+
+    }
+}

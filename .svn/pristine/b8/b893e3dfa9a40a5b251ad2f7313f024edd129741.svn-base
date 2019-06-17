@@ -1,0 +1,131 @@
+﻿@using EIP.Common.Entities
+@using EIP.Common.Entities.Dtos
+@using EIP.Web.DataUsers.Helpers
+
+@{
+    ViewBag.Title = "EQP Group Performance";
+    ViewBag.Require = "reporting-eqpgroupperformance-eqpgroupperformance";
+    Layout = "~/Views/Shared/_LayoutPageBaseList.cshtml";
+}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel-group" id="accordion">
+                <div class=" panel panel-primary">
+                    <div class="panel-heading text-center">
+                        <h3 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion"
+                               href="#condition">
+                                EQP Group Performance
+                            </a>
+                        </h3>
+                    </div>
+                    <div id="condition" class="panel-collapse collapse in">
+                        <div class="panel-body">
+                            <form class="form-horizontal">
+                                <div class="row">
+                                    <div class="col-lg-4 form-group">
+
+                                        <div class="col-sm-4  ">
+                                            <label class="control-label  ">Time Option:</label>
+                                        </div>
+                                        <!--<div class="radio col-sm-3">
+                                        <label>
+                                            <input type="radio" name="timeOption" id="rdoUpToNow" value="1" checked>
+                                            UpToNow
+                                        </label>
+                                    </div>-->
+                                        <div class="radio col-sm-4">
+                                            <label>
+                                                <input type="radio" name="timeOption" id="rdoLastDay" value="2" checked>
+                                                LastDay
+                                            </label>
+                                        </div>
+                                        <div class="radio col-sm-4">
+                                            <label>
+                                                <input type="radio" name="timeOption" id="rdoPeriod" value="3">
+                                                TimePeriod
+                                            </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 form-group">
+                                        <div class="col-sm-3  ">
+                                            <label for="startDate" class="control-label  "><span class="need">*</span>Start Time:</label>
+                                        </div>
+                                        <div class="col-sm-9  ">
+                                            <input id="StartTime" type="text" name="StartTime" readonly class="form-control manualfilter  " onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',readOnly:true,isShowClear:false})" />
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 form-group">
+                                        <div class="col-sm-3  ">
+                                            <label for="EndDate" class="control-label  "><span class="need">*</span>End Time:</label>
+                                        </div>
+                                        <div class="col-sm-9  ">
+                                            <input id="EndTime" type="text" name="EndTime" readonly class="form-control manualfilter  " onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',readOnly:true,isShowClear:false})" /><br>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row" style="padding-top:10px;">
+                                    <div class="col-lg-4 form-group">
+                                        <div class="col-sm-3  ">
+                                            <label for="Area" class="control-label  ">Area:</label>
+                                        </div>
+                                        <div class="col-sm-9  ">
+                                            <select id="selArea" name="Area" class="form-control manualfilter select2"></select>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 form-group">
+                                        <div class="col-sm-3  ">
+                                            <label for="EQPCap" class="control-label  ">EQP Cap:</label>
+                                        </div>
+                                        <div class="col-sm-9  ">
+                                            <select id="selEQPCap" name="EQPCap" class="form-control manualfilter select2"></select>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 form-group">
+                                        <div class="col-sm-3  ">
+                                            <label for="EQPType" class="control-label  "><span class="need">*</span>EQP Type:</label>
+                                        </div>
+                                        <div class="col-sm-9  ">
+                                            <select id="selEQPType" name="EQPType" class="form-control manualfilter select2"></select>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                                <div class="row" style="padding-top:10px;">
+                                    <div class="col-lg-10"></div>
+                                    <div class="col-lg-2">
+                                        <div class="col-sm-6">
+                                            <input type="button" name="btn_select_box" value="搜 索" class="btn btn-primary pull-right" />
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <input type="button" name="btn_reset_box" value="重 置" class="btn pull-right">
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-lg-12">
+                <div class="panel panel-info">
+                    <div class="panel-heading">
+                        <h3 class="panel-title">EQP Group Performance</h3>
+                    </div>
+                    <div class="panel-body" id="listpnlbody">
+                        <div class="col-lg-12">
+                            <table id="list" class="grid"></table>
+                            <div id="pager"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

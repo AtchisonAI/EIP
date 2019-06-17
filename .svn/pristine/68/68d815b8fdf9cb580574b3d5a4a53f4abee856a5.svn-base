@@ -1,0 +1,465 @@
+﻿define(['reportingbootstrap'],
+    function (abc) {
+        initSelect();
+        initGird();
+        initGird1();
+        initGird2();
+        initGird3();
+        initGird4();
+        //initGirdAdd();
+        size = UtilWindowHeightWidth();
+        
+    });
+
+function ValidateInput() {
+  //  alert($('#selProductID').val());
+    
+    if ($('#StartTime').val() == '') {
+        DialogTipsMsgError('请输入StartTime!', 5000);
+        $('#StartTime').focus();
+        return false;
+    }
+    if ($('#EndTime').val() == '') {
+        DialogTipsMsgError('请输入EndTime!', 5000);
+        $('#EndTime').focus();
+        return false;
+    }
+    return true;
+}
+
+function initSelect() {
+
+    $("#selTechID").select2({
+        language: "zh-CN", //设置 提示语言
+        width: "100%", //设置下拉框的宽度
+        placeholder: "请单击或输入数据过滤，选择TECH.ID！",
+        maximumSelectionLength: 2,  //设置最多可以选择多少项
+        multiple: true,//设置是否可以多选
+        allowClear: true,//允许清空
+        ajax: {
+            url: "/Common/Common/QueryTechIDSelectList",// /Common 文件夹名，/common controllers名字，/query..方法名字 获取数据的地址
+            dataType: 'json',
+            delay: 250,//按键之后多久才提交后台进行查询
+            data: function (params) {//查询参数
+                return {
+                    selTechID: params.term,//获取输入作为productfamily，提交后台
+                    page: params.page || 1//当前页数
+                };
+            },
+            processResults: function (result, params) {//获取到后台数据后，进行解析
+                params.page = params.page || 1;
+                if (result.isSuccess) {
+                    return {
+                        results: result.data,
+                        pagination: {
+                            more: (params.page * 10) < result.totalCount//分页条件：当前已显示数量<总数
+                        }
+                    };
+                } else {
+                    return {
+                        results: null
+                    };
+                }
+            },
+            cache: true
+        },
+        escapeMarkup: function (markup) { return markup; } // let our custom formatter work
+        //minimumInputLength: 1
+    });
+}
+
+
+    var size; //宽高
+
+
+    function loadGraph(data) {
+
+        myChart.setOption(data);
+
+    }
+
+    //初始化表格
+    function initGird() {
+        $grid = $("#list").jgridview(
+            {
+                datatype: "local",
+                multiselect: false,
+                loadonce: false,
+                shrinkToFit: true,
+                url: '/Reporting/ProductIndices/QueryInfo',
+                colModel: [
+                    { label: "Date", name: "RECORD_DATE", width: 130, fixed: true },
+                    { label: "Lottype", name: "LOTTYPE", width: 100, fixed: true },
+                    { label: "BOH", name: "BOH", width: 100, fixed: true },
+                    { label: "Move(Lot)", name: "MOVELLOTQTY", width: 100, fixed: true },
+                    { label: "Move(Wafer)", name: "MOVEWAFERQTY", width: 100, fixed: true },
+                    {
+                        label: "Strat", name: "WAFERSTARTQTY", width: 100, fixed: true, formatter: function (cellValue, options, rowdata, action) {
+                            return "<a herf='javascript:(0)' onclick='showStartDetails(\"" + rowdata.RECORD_DATE + "\")' ><font color='blue'><u>" + rowdata.WAFERSTARTQTY + "</u></blue></a>";
+                        }
+                    },
+                    { label: "Out", name: "SHIPQTY", width: 100, fixed: true },
+                    { label: "Unship", name: "UNSHIPQTY", width: 100, fixed: true },
+                    { label: "BankIn", name: "BANKINQTY", width: 100, fixed: true },
+                    { label: "BankOut", name: "BANKOUTQTY", width: 100, fixed: true },
+                    {
+                        label: "Scrap", name: "SCRAPQTY", width: 100, fixed: true, formatter: function (cellValue, options, rowdata, action) {
+                            return "<a herf='javascript:(0)' onclick='showScrapDetails(\"" + rowdata.RECORD_DATE + "\")' ><font color='blue'><u>" + rowdata.SCRAPQTY + "</u></blue></a>";
+                        }
+                    },
+                    {
+                        label: "UnScrap", name: "UNSCRAPQTY", width: 100, fixed: true, formatter: function(cellValue, options, rowdata, action) {
+                            return "<a herf='javascript:(0)' onclick='showUnscrapDetails(\"" + rowdata.RECORD_DATE + "\")' ><font color='blue'><u>" + rowdata.UNSCRAPQTY + "</u></blue></a>";
+                        }
+                    },
+                    { label: "Yield", name: "YIELD", width: 100, fixed: true },
+                    {
+                        label: "Hold", name: "HOLDQTY", width: 100, fixed: true, formatter: function (cellValue, options, rowdata, action) {
+                            return "<a herf='javascript:(0)' onclick='showHoldDetails(\"" + rowdata.RECORD_DATE + "\")' ><font color='blue'><u>" + rowdata.HOLDQTY + "</u></blue></a>";
+                        }
+                    },
+                    {
+                        label: "Rework", name: "REWORKQTY", width: 100, fixed: true, formatter: function (cellValue, options, rowdata, action) {
+                            return "<a herf='javascript:(0)' onclick='showReworkDetails(\"" + rowdata.RECORD_DATE + "\")' ><font color='blue'><u>" + rowdata.REWORKQTY + "</u></blue></a>";
+                        }
+                    }
+            
+                ],
+                sortname: "RECORD_DATE",
+                height: '740px',
+                sortorder: "asc",
+                additionalLoadCompleteAction: function (json) {
+
+                }
+            });
+    }
+
+    function initGird1() {
+        $grid = $("#list1").jgridview(
+            {
+                datatype: "local",
+                multiselect: false,
+                loadonce: false,
+                shrinkToFit: true,
+                url: '/Reporting/ProductIndices/QueryInfo1',
+                colModel: [
+                    { label: "Date", name: "RECORD_DATE", width: 130, fixed: true },
+                    { label: "Lottype", name: "LOTTYPE", width: 100, fixed: true },
+                    { label: "BOH", name: "BOH", width: 100, fixed: true },
+                    { label: "Move(Lot)", name: "MOVELLOTQTY", width: 100, fixed: true },
+                    { label: "Move(Wafer)", name: "MOVEWAFERQTY", width: 100, fixed: true },
+                    {
+                        label: "Strat", name: "WAFERSTARTQTY", width: 100, fixed: true, formatter: function (cellValue, options, rowdata, action) {
+                            return "<a herf='javascript:(0)' onclick='showStartDetails1(\"" + rowdata.RECORD_DATE + "\")' ><font color='blue'><u>" + rowdata.WAFERSTARTQTY + "</u></blue></a>";
+                        }
+                    },
+                    { label: "Out", name: "SHIPQTY", width: 100, fixed: true },
+                    { label: "Unship", name: "UNSHIPQTY", width: 100, fixed: true },
+                    { label: "BankIn", name: "BANKINQTY", width: 100, fixed: true },
+                    { label: "BankOut", name: "BANKOUTQTY", width: 100, fixed: true },
+                    {
+                        label: "Scrap", name: "SCRAPQTY", width: 100, fixed: true, formatter: function (cellValue, options, rowdata, action) {
+                            return "<a herf='javascript:(0)' onclick='showScrapDetails1(\"" + rowdata.RECORD_DATE + "\")' ><font color='blue'><u>" + rowdata.SCRAPQTY + "</u></blue></a>";
+                        }
+                    },
+                    {
+                        label: "UnScrap", name: "UNSCRAPQTY", width: 100, fixed: true, formatter: function (cellValue, options, rowdata, action) {
+                            return "<a herf='javascript:(0)' onclick='showUnscrapDetails1(\"" + rowdata.RECORD_DATE + "\")' ><font color='blue'><u>" + rowdata.UNSCRAPQTY + "</u></blue></a>";
+                        }
+                    },
+                    { label: "Yield", name: "YIELD", width: 100, fixed: true },
+                    {
+                        label: "Hold", name: "HOLDQTY", width: 100, fixed: true, formatter: function (cellValue, options, rowdata, action) {
+                            return "<a herf='javascript:(0)' onclick='showHoldDetails1(\"" + rowdata.RECORD_DATE + "\")' ><font color='blue'><u>" + rowdata.HOLDQTY + "</u></blue></a>";
+                        }
+                    },
+                    {
+                        label: "Rework", name: "REWORKQTY", width: 100, fixed: true, formatter: function (cellValue, options, rowdata, action) {
+                            return "<a herf='javascript:(0)' onclick='showReworkDetails1(\"" + rowdata.RECORD_DATE + "\")' ><font color='blue'><u>" + rowdata.REWORKQTY + "</u></blue></a>";
+                        }
+                    }
+
+                ],
+                sortname: "RECORD_DATE",
+                height: '740px',
+                sortorder: "asc",
+                additionalLoadCompleteAction: function (json) {
+
+                }
+            });
+    }
+
+function initGird2() {
+    $grid = $("#list2").jgridview(
+        {
+            datatype: "local",
+            multiselect: false,
+            loadonce: false,
+            shrinkToFit: true,
+            url: '/Reporting/ProductIndices/QueryInfo2',
+            colModel: [
+                { label: "Date", name: "RECORD_DATE", width: 130, fixed: true },
+                { label: "Lottype", name: "LOTTYPE", width: 100, fixed: true },
+                { label: "BOH", name: "BOH", width: 100, fixed: true },
+                { label: "Move(Lot)", name: "MOVELLOTQTY", width: 100, fixed: true },
+                { label: "Move(Wafer)", name: "MOVEWAFERQTY", width: 100, fixed: true },
+                {
+                    label: "Strat", name: "WAFERSTARTQTY", width: 100, fixed: true, formatter: function (cellValue, options, rowdata, action) {
+                        return "<a herf='javascript:(0)' onclick='showStartDetails2(\"" + rowdata.RECORD_DATE + "\")' ><font color='blue'><u>" + rowdata.WAFERSTARTQTY + "</u></blue></a>";
+                    }
+                },
+                { label: "Out", name: "SHIPQTY", width: 100, fixed: true },
+                { label: "Unship", name: "UNSHIPQTY", width: 100, fixed: true },
+                { label: "BankIn", name: "BANKINQTY", width: 100, fixed: true },
+                { label: "BankOut", name: "BANKOUTQTY", width: 100, fixed: true },
+                {
+                    label: "Scrap", name: "SCRAPQTY", width: 100, fixed: true, formatter: function (cellValue, options, rowdata, action) {
+                        return "<a herf='javascript:(0)' onclick='showScrapDetails2(\"" + rowdata.RECORD_DATE + "\")' ><font color='blue'><u>" + rowdata.SCRAPQTY + "</u></blue></a>";
+                    }
+                },
+                {
+                    label: "UnScrap", name: "UNSCRAPQTY", width: 100, fixed: true, formatter: function (cellValue, options, rowdata, action) {
+                        return "<a herf='javascript:(0)' onclick='showUnscrapDetails2(\"" + rowdata.RECORD_DATE + "\")' ><font color='blue'><u>" + rowdata.UNSCRAPQTY + "</u></blue></a>";
+                    }
+                },
+                { label: "Yield", name: "YIELD", width: 100, fixed: true },
+                {
+                    label: "Hold", name: "HOLDQTY", width: 100, fixed: true, formatter: function (cellValue, options, rowdata, action) {
+                        return "<a herf='javascript:(0)' onclick='showHoldDetails2(\"" + rowdata.RECORD_DATE + "\")' ><font color='blue'><u>" + rowdata.HOLDQTY + "</u></blue></a>";
+                    }
+                },
+                {
+                    label: "Rework", name: "REWORKQTY", width: 100, fixed: true, formatter: function (cellValue, options, rowdata, action) {
+                        return "<a herf='javascript:(0)' onclick='showReworkDetails2(\"" + rowdata.RECORD_DATE + "\")' ><font color='blue'><u>" + rowdata.REWORKQTY + "</u></blue></a>";
+                    }
+                }
+
+            ],
+            sortname: "RECORD_DATE",
+            height: '740px',
+            sortorder: "asc",
+            additionalLoadCompleteAction: function (json) {
+
+            }
+        });
+}
+
+function initGird3() {
+    $grid = $("#list3").jgridview(
+        {
+            datatype: "local",
+            multiselect: false,
+            loadonce: false,
+            shrinkToFit: true,
+            url: '/Reporting/ProductIndices/QueryInfo3',
+            colModel: [
+                { label: "Date", name: "RECORD_DATE", width: 130, fixed: true },
+                { label: "Lottype", name: "LOTTYPE", width: 100, fixed: true },
+                { label: "BOH", name: "BOH", width: 100, fixed: true },
+                { label: "Move(Lot)", name: "MOVELLOTQTY", width: 100, fixed: true },
+                { label: "Move(Wafer)", name: "MOVEWAFERQTY", width: 100, fixed: true },
+                {
+                    label: "Strat", name: "WAFERSTARTQTY", width: 100, fixed: true, formatter: function (cellValue, options, rowdata, action) {
+                        return "<a herf='javascript:(0)' onclick='showStartDetails3(\"" + rowdata.RECORD_DATE + "\")' ><font color='blue'><u>" + rowdata.WAFERSTARTQTY + "</u></blue></a>";
+                    }
+                },
+                { label: "Out", name: "SHIPQTY", width: 100, fixed: true },
+                { label: "Unship", name: "UNSHIPQTY", width: 100, fixed: true },
+                { label: "BankIn", name: "BANKINQTY", width: 100, fixed: true },
+                { label: "BankOut", name: "BANKOUTQTY", width: 100, fixed: true },
+                {
+                    label: "Scrap", name: "SCRAPQTY", width: 100, fixed: true, formatter: function (cellValue, options, rowdata, action) {
+                        return "<a herf='javascript:(0)' onclick='showScrapDetails3(\"" + rowdata.RECORD_DATE + "\")' ><font color='blue'><u>" + rowdata.SCRAPQTY + "</u></blue></a>";
+                    }
+                },
+                {
+                    label: "UnScrap", name: "UNSCRAPQTY", width: 100, fixed: true, formatter: function (cellValue, options, rowdata, action) {
+                        return "<a herf='javascript:(0)' onclick='showUnscrapDetails3(\"" + rowdata.RECORD_DATE + "\")' ><font color='blue'><u>" + rowdata.UNSCRAPQTY + "</u></blue></a>";
+                    }
+                },
+                { label: "Yield", name: "YIELD", width: 100, fixed: true },
+                {
+                    label: "Hold", name: "HOLDQTY", width: 100, fixed: true, formatter: function (cellValue, options, rowdata, action) {
+                        return "<a herf='javascript:(0)' onclick='showHoldDetails3(\"" + rowdata.RECORD_DATE + "\")' ><font color='blue'><u>" + rowdata.HOLDQTY + "</u></blue></a>";
+                    }
+                },
+                {
+                    label: "Rework", name: "REWORKQTY", width: 100, fixed: true, formatter: function (cellValue, options, rowdata, action) {
+                        return "<a herf='javascript:(0)' onclick='showReworkDetails3(\"" + rowdata.RECORD_DATE + "\")' ><font color='blue'><u>" + rowdata.REWORKQTY + "</u></blue></a>";
+                    }
+                }
+
+            ],
+            sortname: "RECORD_DATE",
+            height: '740px',
+            sortorder: "asc",
+            additionalLoadCompleteAction: function (json) {
+
+            }
+        });
+}
+
+function initGird4() {
+    $grid = $("#list4").jgridview(
+        {
+            datatype: "local",
+            multiselect: false,
+            loadonce: false,
+            shrinkToFit: true,
+            url: '/Reporting/ProductIndices/QueryInfo4',
+            colModel: [
+                { label: "Date", name: "RECORD_DATE", width: 130, fixed: true },
+                { label: "Lottype", name: "LOTTYPE", width: 100, fixed: true },
+                { label: "BOH", name: "BOH", width: 100, fixed: true },
+                { label: "Move(Lot)", name: "MOVELLOTQTY", width: 100, fixed: true },
+                { label: "Move(Wafer)", name: "MOVEWAFERQTY", width: 100, fixed: true },
+                {
+                    label: "Strat", name: "WAFERSTARTQTY", width: 100, fixed: true, formatter: function (cellValue, options, rowdata, action) {
+                        return "<a herf='javascript:(0)' onclick='showStartDetails4(\"" + rowdata.RECORD_DATE + "\")' ><font color='blue'><u>" + rowdata.WAFERSTARTQTY + "</u></blue></a>";
+                    }
+                },
+                { label: "Out", name: "SHIPQTY", width: 100, fixed: true },
+                { label: "Unship", name: "UNSHIPQTY", width: 100, fixed: true },
+                { label: "BankIn", name: "BANKINQTY", width: 100, fixed: true },
+                { label: "BankOut", name: "BANKOUTQTY", width: 100, fixed: true },
+                {
+                    label: "Scrap", name: "SCRAPQTY", width: 100, fixed: true, formatter: function (cellValue, options, rowdata, action) {
+                        return "<a herf='javascript:(0)' onclick='showScrapDetails4(\"" + rowdata.RECORD_DATE + "\")' ><font color='blue'><u>" + rowdata.SCRAPQTY + "</u></blue></a>";
+                    }
+                },
+                {
+                    label: "UnScrap", name: "UNSCRAPQTY", width: 100, fixed: true, formatter: function (cellValue, options, rowdata, action) {
+                        return "<a herf='javascript:(0)' onclick='showUnscrapDetails4(\"" + rowdata.RECORD_DATE + "\")' ><font color='blue'><u>" + rowdata.UNSCRAPQTY + "</u></blue></a>";
+                    }
+                },
+                { label: "Yield", name: "YIELD", width: 100, fixed: true },
+                {
+                    label: "Hold", name: "HOLDQTY", width: 100, fixed: true, formatter: function (cellValue, options, rowdata, action) {
+                        return "<a herf='javascript:(0)' onclick='showHoldDetails4(\"" + rowdata.RECORD_DATE + "\")' ><font color='blue'><u>" + rowdata.HOLDQTY + "</u></blue></a>";
+                    }
+                },
+                {
+                    label: "Rework", name: "REWORKQTY", width: 100, fixed: true, formatter: function (cellValue, options, rowdata, action) {
+                        return "<a herf='javascript:(0)' onclick='showReworkDetails4(\"" + rowdata.RECORD_DATE + "\")' ><font color='blue'><u>" + rowdata.REWORKQTY + "</u></blue></a>";
+                    }
+                }
+
+            ],
+            sortname: "RECORD_DATE",
+            height: '740px',
+            sortorder: "asc",
+            additionalLoadCompleteAction: function (json) {
+
+            }
+        });
+}
+
+
+//Start Detail
+function showStartDetails(RECORD_DATE) {
+    ArtDialogOpen("/Reporting/ProductIndices/StartDetails?date=" + RECORD_DATE + "&type=LotStart" + "&Part=Production", "StartDetails-" + RECORD_DATE, true, 750, 1200, true);
+}
+
+function showStartDetails1(RECORD_DATE) {
+    ArtDialogOpen("/Reporting/ProductIndices/StartDetails?date=" + RECORD_DATE + "&type=LotStart" + "&Part=Engineering", "StartDetails-" + RECORD_DATE, true, 750, 1200, true);
+}
+
+function showStartDetails2(RECORD_DATE) {
+    ArtDialogOpen("/Reporting/ProductIndices/StartDetails?date=" + RECORD_DATE + "&type=LotStart" + "&Part=Backup", "StartDetails-" + RECORD_DATE, true, 750, 1200, true);
+}
+
+function showStartDetails3(RECORD_DATE) {
+    ArtDialogOpen("/Reporting/ProductIndices/StartDetails?date=" + RECORD_DATE + "&type=LotStart" + "&Part=NPW", "StartDetails-" + RECORD_DATE, true, 750, 1200, true);
+}
+
+function showStartDetails4(RECORD_DATE) {
+    ArtDialogOpen("/Reporting/ProductIndices/StartDetails?date=" + RECORD_DATE + "&type=LotStart" + "&Part=Total", "StartDetails-" + RECORD_DATE, true, 750, 1200, true);
+}
+
+//Scrap Detail
+function showScrapDetails(RECORD_DATE) {
+    ArtDialogOpen("/Reporting/ProductIndices/ScrapDetails?date=" + RECORD_DATE + "&type=Scrap" + "&Part=Production", "ScrapDetails-" + RECORD_DATE, true, 750, 1200, true);
+}
+
+function showScrapDetails1(RECORD_DATE) {
+    ArtDialogOpen("/Reporting/ProductIndices/ScrapDetails?date=" + RECORD_DATE + "&type=Scrap" + "&Part=Engineering", "ScrapDetails-" + RECORD_DATE, true, 750, 1200, true);
+}
+
+function showScrapDetails2(RECORD_DATE) {
+    ArtDialogOpen("/Reporting/ProductIndices/ScrapDetails?date=" + RECORD_DATE + "&type=Scrap" + "&Part=Backup", "ScrapDetails-" + RECORD_DATE, true, 750, 1200, true);
+}
+
+function showScrapDetails3(RECORD_DATE) {
+    ArtDialogOpen("/Reporting/ProductIndices/ScrapDetails?date=" + RECORD_DATE + "&type=Scrap" + "&Part=NPW", "ScrapDetails-" + RECORD_DATE, true, 750, 1200, true);
+}
+
+function showScrapDetails4(RECORD_DATE) {
+    ArtDialogOpen("/Reporting/ProductIndices/ScrapDetails?date=" + RECORD_DATE + "&type=Scrap" + "&Part=Total", "ScrapDetails-" + RECORD_DATE, true, 750, 1200, true);
+}
+
+//Unscrap Detail
+function showUnscrapDetails(RECORD_DATE) {
+    ArtDialogOpen("/Reporting/ProductIndices/UnscrapDetails?date=" + RECORD_DATE + "&type=Unscrap" + "&Part=Production", "UnscrapDetails-" + RECORD_DATE, true, 750, 1200, true);
+}
+
+function showUnscrapDetails1(RECORD_DATE) {
+    ArtDialogOpen("/Reporting/ProductIndices/UnscrapDetails?date=" + RECORD_DATE + "&type=Unscrap" + "&Part=Engineering", "UnscrapDetails-" + RECORD_DATE, true, 750, 1200, true);
+}
+
+function showUnscrapDetails2(RECORD_DATE) {
+    ArtDialogOpen("/Reporting/ProductIndices/UnscrapDetails?date=" + RECORD_DATE + "&type=Unscrap" + "&Part=Backup", "UnscrapDetails-" + RECORD_DATE, true, 750, 1200, true);
+}
+
+function showUnscrapDetails3(RECORD_DATE) {
+    ArtDialogOpen("/Reporting/ProductIndices/UnscrapDetails?date=" + RECORD_DATE + "&type=Unscrap" + "&Part=NPW", "UnscrapDetails-" + RECORD_DATE, true, 750, 1200, true);
+}
+
+function showUnscrapDetails4(RECORD_DATE) {
+    ArtDialogOpen("/Reporting/ProductIndices/UnscrapDetails?date=" + RECORD_DATE + "&type=Unscrap" + "&Part=Total", "UnscrapDetails-" + RECORD_DATE, true, 750, 1200, true);
+}
+
+//Hold Detail
+function showHoldDetails(RECORD_DATE) {
+    ArtDialogOpen("/Reporting/ProductIndices/HoldDetails?date=" + RECORD_DATE + "&type=Hold" + "&Part=Production", "ScrapDetails-" + RECORD_DATE, true, 750, 1200, true);
+}
+
+function showHoldDetails1(RECORD_DATE) {
+    ArtDialogOpen("/Reporting/ProductIndices/HoldDetails?date=" + RECORD_DATE + "&type=Hold" + "&Part=Engineering", "ScrapDetails-" + RECORD_DATE, true, 750, 1200, true);
+}
+
+function showHoldDetails2(RECORD_DATE) {
+    ArtDialogOpen("/Reporting/ProductIndices/HoldDetails?date=" + RECORD_DATE + "&type=Hold" + "&Part=Backup", "ScrapDetails-" + RECORD_DATE, true, 750, 1200, true);
+}
+
+function showHoldDetails3(RECORD_DATE) {
+    ArtDialogOpen("/Reporting/ProductIndices/HoldDetails?date=" + RECORD_DATE + "&type=Hold" + "&Part=NPW", "ScrapDetails-" + RECORD_DATE, true, 750, 1200, true);
+}
+
+
+function showHoldDetails4(RECORD_DATE) {
+    ArtDialogOpen("/Reporting/ProductIndices/HoldDetails?date=" + RECORD_DATE + "&type=Hold" + "&Part=Total", "ScrapDetails-" + RECORD_DATE, true, 750, 1200, true);
+}
+
+//Rework Detail
+function showReworkDetails(RECORD_DATE) {
+    ArtDialogOpen("/Reporting/ProductIndices/ReworkDetails?date=" + RECORD_DATE + "&type=Rework" + "&Part=Production", "ScrapDetails-" + RECORD_DATE, true, 750, 1200, true);
+}
+
+function showReworkDetails1(RECORD_DATE) {
+    ArtDialogOpen("/Reporting/ProductIndices/ReworkDetails?date=" + RECORD_DATE + "&type=Rework" + "&Part=Engineering", "ScrapDetails-" + RECORD_DATE, true, 750, 1200, true);
+}
+
+
+function showReworkDetails2(RECORD_DATE) {
+    ArtDialogOpen("/Reporting/ProductIndices/ReworkDetails?date=" + RECORD_DATE + "&type=Rework" + "&Part=Backup", "ScrapDetails-" + RECORD_DATE, true, 750, 1200, true);
+}
+
+
+function showReworkDetails3(RECORD_DATE) {
+    ArtDialogOpen("/Reporting/ProductIndices/ReworkDetails?date=" + RECORD_DATE + "&type=Rework" + "&Part=NPW", "ScrapDetails-" + RECORD_DATE, true, 750, 1200, true);
+}
+
+
+function showReworkDetails4(RECORD_DATE) {
+    ArtDialogOpen("/Reporting/ProductIndices/ReworkDetails?date=" + RECORD_DATE + "&type=Rework" + "&Part=Total", "ScrapDetails-" + RECORD_DATE, true, 750, 1200, true);
+}

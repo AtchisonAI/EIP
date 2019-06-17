@@ -1,0 +1,162 @@
+﻿@using EIP.Common.Entities
+@using EIP.Common.Entities.Dtos
+@using EIP.Web.DataUsers.Helpers
+
+@{
+    ViewBag.Title = "EQP Status Monitor";
+    ViewBag.Require = "reporting-eqpstatusmonitor-eqpstatusmonitor";
+    Layout = "~/Views/Shared/_LayoutPageBaseList.cshtml";
+}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class=" panel panel-primary">
+                <div class="panel-heading text-center">
+                    <h3 class="panel-title">EQP Status Monitor</h3>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="row">
+                            <div class="col-lg-9">
+                                <div class="row">
+                                    <div class="col-lg-4 form-group">
+
+                                        <div class="col-sm-3 text-right">
+                                            <label class="control-label text-right">Time Option:</label>
+                                        </div>
+                                        <div class="radio col-sm-3">
+                                            <label>
+                                                <input type="radio" name="timeOption" id="rdoUpToNow" value="1" checked>
+                                                Up To Now
+                                            </label>
+                                        </div>
+                                        <div class="radio col-sm-3">
+                                            <label>
+                                                <input type="radio" name="timeOption" id="rdoLastDay" value="2">
+                                                Last Day
+                                            </label>
+                                        </div>
+                                        <div class="radio col-sm-3">
+                                                  <label>
+                                                      <input type="radio" name="timeOption" id="rdoPeriod" value="3">
+                                                      Time Period
+                                                  </label>
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 form-group">
+                                        <div class="col-sm-3 text-right">
+                                            <label for="Area" class="control-label text-right">Area:</label>
+                                        </div>
+                                        <div class="col-sm-9 text-left">
+                                            <select id="selArea" name="Area" class="form-control manualfilter select2"></select>
+
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 form-group">
+                                        <div class="col-sm-3 text-right">
+                                            <label for="EQPType" class="control-label text-right">
+                                                EQP Type:
+                                            </label>
+                                        </div>
+                                        <div class="col-sm-9 text-left">
+                                            <select id="selEQPType" name="EQPType" class="form-control manualfilter select2"></select>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="row" style="padding-top:10px;">
+                                    
+                                    <div class="col-lg-4 form-group">
+                                        <div class="col-sm-3 text-right">
+                                            <label for="startDate" class="control-label text-right"><span class="need">*</span>Start Time:</label>
+                                        </div>
+                                        <div class="col-sm-9 text-left">
+                                            <input id="StartTime" type="text" name="StartTime" readonly disabled class="form-control manualfilter text-left" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',readOnly:true})" />
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-4 form-group">
+                                         <div class="col-sm-3 text-right">
+                                             <label for="EndDate" class="control-label text-right"><span class="need">*</span>End Time:</label>
+                                         </div>
+                                         <div class="col-sm-9 text-left">
+                                             <input id="EndTime" type="text" name="EndTime" readonly  disabled class="form-control manualfilter text-left" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',readOnly:true})" /><br>
+                                         </div>
+                                    </div>
+
+                                    <div class="col-lg-4 form-group">
+                                        <div class="checkbox col-sm-offset-2">
+                                            <label>
+                                                <input type="checkbox" value="">
+                                                Include Chamber
+                                            </label>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3">
+                                <div class="row form-group">
+                                    <div class="col-sm-3 text-right">
+                                        <label for="EQP" class="control-label text-right">
+                                            <span class="need">*</span>
+                                            EQP:
+                                        </label>
+                                    </div>
+                                    <div class="col-sm-9 text-left">
+                                        <select id="selEQP" name="EQP" class="form-control manualfilter select2"></select>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" style="padding-top:10px;">
+                            <div class="col-lg-10"></div>
+                            <div class="col-lg-2">
+                                <div class="col-sm-6">
+                                    <input type="button" name="btn_select_box" value="搜 索" class="btn btn-primary pull-right" />
+                                </div>
+                                <div class="col-sm-6">
+                                    <input type="button" name="btn_reset_box" value="重 置" class="btn pull-right">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">状态分布图</h3><small>各状态下WIP分布</small>
+                </div>
+                <div class="panel-body">
+                    <div class="det_inner chart" id="browserAnalysis" style="height: 500px"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">状态分布图</h3><small>各状态下WIP分布</small>
+                </div>
+                <div class="panel-body">
+                    <div class="det_inner chart" id="browserAnalysis1" style="height: 500px"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">WIP Details</h3>
+                </div>
+                <div class="panel-body" id="listpnlbody">
+                    <table id="list" class="grid"></table>
+                    <div id="pager"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

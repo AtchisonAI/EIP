@@ -1,0 +1,40 @@
+﻿using EIP.Common.Entities.CustomAttributes;
+using EIP.Common.Entities.Dtos;
+using EIP.Common.Entities.Paging;
+
+namespace HiDM.Reporting.Models
+{
+    public class QueryInfoInput: QueryParam,IInputDto
+    {
+        [Param]
+        public string TechID{ get; set; }
+
+        [Param]
+        public string CustomerID { get; set; }
+
+        [Param]
+        public string ProductID { get; set; }
+
+        [Param]
+        public string StartTime { get; set; }
+
+        [Param]
+        public string EndTime { get; set; }
+
+        [Param]
+        public string Priority { get; set; }
+
+        [Param]
+        public string InternalPriority { get; set; }
+
+     //   [Param]
+       // public string Monthly { get; set; }
+
+        //[Param]
+        //public string Weekly { get; set; }
+
+        //[Param]
+        //public string Daily { get; set; }
+
+    }
+}

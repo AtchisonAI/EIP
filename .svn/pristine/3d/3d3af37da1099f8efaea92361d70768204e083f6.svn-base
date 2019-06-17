@@ -1,0 +1,50 @@
+﻿@{
+    ViewBag.Title = "Release Lot";
+    ViewBag.Require = "reporting-holdwipreport-releaselots";
+    Layout = "~/Views/Shared/_LayoutPageEditSubmit.cshtml";
+}
+
+@using EIP.Common.Entities.Dtos
+@using EIP.Web.DataUsers.Helpers
+
+@model HiDM.Reporting.Models.ReleaseLotInput
+@Html.EditTopRemark(new EditTopRemarkInput
+{
+    Title = "请填写Release信息",
+    Remark = "注：带*号的为必填信息！"
+})
+<div class="edit-content">
+    <table class="complex-table">
+        <tbody>
+            <tr>
+                <th style="width: 130px" class="m">
+                    Release Reason：
+                </th>
+                <td>
+                    @Html.DropDownListSQL(new DropDownListSQLInput
+                    {
+                    ConnectionString = "HiDM.Reporting.DataAccess",
+                    SQL = @"SELECT RC.NAME VALUE,RC.SHORTDESCRIPTION NAME FROM FWREASONCODECATEGORY RCC
+                    JOIN FWREASONCODECATEGORY_N2M RCCN
+                    ON RCC.SYSID = RCCN.FROMID AND RCCN.LINKNAME = 'reasonCodes'
+                    JOIN FWREASONCODE RC
+                    ON RCCN.TOID = RC.SYSID
+                    WHERE RCC.NAME = 'Release'",
+                    Name = "ReleaseReason",
+                    NeedDefault = true,
+                    HtmlAttributes = new { @datatype = "*" }
+
+                    })
+                </td>
+            </tr>
+            <tr>
+                <th valign="top">
+                    Comments：
+                </th>
+                <td>
+                    @Html.TextAreaFor(f => @Model.Comments, new { datatype = "*1-1024",  style = "height:40px" })
+                </td>
+            </tr>
+        </tbody>
+    </table>
+</div>

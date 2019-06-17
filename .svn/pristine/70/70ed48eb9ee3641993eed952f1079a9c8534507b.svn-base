@@ -1,0 +1,102 @@
+﻿define(['reportingbootstrap'],
+    function (abc) {
+        initGird();
+        size = UtilWindowHeightWidth();
+    });
+
+
+var size;//宽高
+
+
+//重置流程
+//ResetBefore
+//如果 ResetBefore 返回 true
+//  自动执行clearCondition();
+//  自动执行clearGrids();
+//  自动执行clearCharts();
+//  AdditionalReset
+
+function ResetBefore() {
+    //自动重置之前，执行，如果不希望执行自动重置逻辑，则返回false
+}
+
+function AdditionalReset() {
+
+    return true;
+}
+
+//提交流程
+//ValidateInput
+//如果 ValidateInput 返回 true
+//  BeforeSearchClick
+//  如果 BeforeSearchClick 返回 true
+//      自动执行获取条件
+//      自动执行所有class为grid的元素的reload事件
+//      AfterSearchClick
+function ValidateInput() {
+    //客户端条件验证，如果不通过，返回false
+}
+
+function BeforeSearchClick() {
+    //点击查询按钮后，在查询前触发，如果不希望执行自动查询，可返回false
+    AdditionalReset();
+    //asdfadsfasdf
+    //adsfadsf
+    return true;
+}
+
+
+function AfterSearchClick() {
+
+}
+
+//默认执行class为grid和chart的自适应方法
+function windowResized() {
+
+}
+
+function loadGraph(data) {
+
+    // 基于准备好的dom，获取echarts实例
+    var myChart = echarts.getInstanceByDom(document.getElementById('browserAnalysis'));
+    myChart.setOption(data);
+    // 基于准备好的dom，获取echarts实例
+    var myChart1 = echarts.getInstanceByDom(document.getElementById('browserAnalysis1'));
+    myChart1.setOption(data);
+}
+
+//初始化表格
+function initGird() {
+    var grid = $("#list").jgridview(
+        {
+            datatype: "local",
+            multiselect: false,
+            loadonce: false,
+            shrinkToFit: true,
+            url: '/Reporting/LotHistory/QueryLotHistoryInfo',
+            colModel: [
+                { label: "Product ID", name: "fwh.Productid", width: 50, fixed: true },
+                { label: "Lot Type", name: "fwh.lottype", width: 200, fixed: true },
+                { label: "Qty", name: "hd.lotqtyin", width: 120, fixed: true },
+                { label: "Priority", name: "lot.priority", width: 130, fixed: true },
+                { label: "Stage", name: "hs.stagename", width: 130, fixed: true },
+                { label: "Step", name: "hs.stepid", width: 130, fixed: true },
+                { label: "Step Seq", name: "hs.stepseq", width: 130, fixed: true },
+                { label: "Capability", name: " fwte.capability", width: 130, fixed: true },
+                { label: "EQ_ID", name: " hs.location", width: 130, fixed: true },
+                { label: "ArriveTime", name: "hs.timeheresince", width: 130, fixed: true },
+                { label: "TrackinTime", name: "hs.trackintime", width: 130, fixed: true },
+                { label: "TrackoutTime", name: "hs.Trackouttime", width: 130, fixed: true },
+                { label: "Run Time", name: "runtime", width: 130, fixed: true },
+                { label: "Q_T", name: "queuetime", width: 130, fixed: true },
+                { label: "HoldTime", name: "HoldTime", width: 130, fixed: true }
+               ],
+            sortname: "hs.timeheresince",
+            height: '500px',
+            sortorder: "asc",
+            additionalLoadCompleteAction: function (json) {
+            }
+        });
+    
+}
+

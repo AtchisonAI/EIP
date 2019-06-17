@@ -1,0 +1,73 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 2013
+VisualStudioVersion = 12.0.31101.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "01-UI", "01-UI", "{E23DB044-DBD1-4357-8881-8F4CF6B35345}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02-Service", "02-Service", "{B5EE73E4-F5A8-48FA-B9DC-B6525629EF4B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = ".nuget", ".nuget", "{5C2C455A-0A00-461D-9FED-098B8BCA62C7}"
+	ProjectSection(SolutionItems) = preProject
+		.nuget\NuGet.Config = .nuget\NuGet.Config
+		.nuget\NuGet.exe = .nuget\NuGet.exe
+		.nuget\NuGet.targets = .nuget\NuGet.targets
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EIP.Web", "UI\EIP.Web\EIP.Web.csproj", "{4462F30F-E5F2-4B83-845C-5A6D76AA6BB0}"
+	ProjectSection(ProjectDependencies) = postProject
+		{5CAAFAAE-DB6A-47C3-BB15-3A1A8F8E3A6D} = {5CAAFAAE-DB6A-47C3-BB15-3A1A8F8E3A6D}
+		{6C7A9FB1-4340-49F7-858A-E7D73807AD5B} = {6C7A9FB1-4340-49F7-858A-E7D73807AD5B}
+		{7F7BD3F9-BABD-4AF5-8F1C-EE969B889898} = {7F7BD3F9-BABD-4AF5-8F1C-EE969B889898}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HiDM.Reporting.Business", "Service\Reporting\HiDM.Reporting.Business\HiDM.Reporting.Business.csproj", "{7F7BD3F9-BABD-4AF5-8F1C-EE969B889898}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "02.03-Reporting", "02.03-Reporting", "{D93B22E2-28EC-479B-8C91-6EFF7AFC2AE8}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HiDM.Reporting.DataAccess", "Service\Reporting\HiDM.Reporting.DataAccess\HiDM.Reporting.DataAccess.csproj", "{6C7A9FB1-4340-49F7-858A-E7D73807AD5B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HiDM.Reporting.Models", "Service\Reporting\HiDM.Reporting.Models\HiDM.Reporting.Models.csproj", "{5CAAFAAE-DB6A-47C3-BB15-3A1A8F8E3A6D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{0B74F597-BC60-4BAA-AF04-6087D62A2656}"
+	ProjectSection(SolutionItems) = preProject
+		CIM开发手册 v1.1.docx = CIM开发手册 v1.1.docx
+	EndProjectSection
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{4462F30F-E5F2-4B83-845C-5A6D76AA6BB0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4462F30F-E5F2-4B83-845C-5A6D76AA6BB0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4462F30F-E5F2-4B83-845C-5A6D76AA6BB0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4462F30F-E5F2-4B83-845C-5A6D76AA6BB0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7F7BD3F9-BABD-4AF5-8F1C-EE969B889898}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7F7BD3F9-BABD-4AF5-8F1C-EE969B889898}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7F7BD3F9-BABD-4AF5-8F1C-EE969B889898}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7F7BD3F9-BABD-4AF5-8F1C-EE969B889898}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6C7A9FB1-4340-49F7-858A-E7D73807AD5B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6C7A9FB1-4340-49F7-858A-E7D73807AD5B}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6C7A9FB1-4340-49F7-858A-E7D73807AD5B}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6C7A9FB1-4340-49F7-858A-E7D73807AD5B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{5CAAFAAE-DB6A-47C3-BB15-3A1A8F8E3A6D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5CAAFAAE-DB6A-47C3-BB15-3A1A8F8E3A6D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5CAAFAAE-DB6A-47C3-BB15-3A1A8F8E3A6D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5CAAFAAE-DB6A-47C3-BB15-3A1A8F8E3A6D}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4462F30F-E5F2-4B83-845C-5A6D76AA6BB0} = {E23DB044-DBD1-4357-8881-8F4CF6B35345}
+		{7F7BD3F9-BABD-4AF5-8F1C-EE969B889898} = {D93B22E2-28EC-479B-8C91-6EFF7AFC2AE8}
+		{D93B22E2-28EC-479B-8C91-6EFF7AFC2AE8} = {B5EE73E4-F5A8-48FA-B9DC-B6525629EF4B}
+		{6C7A9FB1-4340-49F7-858A-E7D73807AD5B} = {D93B22E2-28EC-479B-8C91-6EFF7AFC2AE8}
+		{5CAAFAAE-DB6A-47C3-BB15-3A1A8F8E3A6D} = {D93B22E2-28EC-479B-8C91-6EFF7AFC2AE8}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {196F5552-AFE8-453D-898B-D799E929802A}
+	EndGlobalSection
+EndGlobal

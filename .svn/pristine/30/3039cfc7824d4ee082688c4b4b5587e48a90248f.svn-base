@@ -1,0 +1,68 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using HiDM.Reporting.DataAccess;
+using EIP.Common.Entities.Paging;
+using HiDM.FactoryWorks.TibcoRV;
+using HiDM.Reporting.Models;
+using HiDM.FactoryWorks.Messages;
+using EIP.Common.Entities.ECharts;
+using EIP.Common.Entities;
+using System.Data;
+using EIP.Common.Entities.ECharts;
+using System.Globalization;
+using System.Collections;
+using HiDM.Reporting.Models.EQPStatusMonitor;
+
+namespace HiDM.Reporting.Business
+{
+    public class WIPProfileLogic : IWIPProfileLogic
+    {
+        private IWIPProfileRepository _HoldLotInfoRepository;
+
+        public WIPProfileLogic(IWIPProfileRepository holdLotInfoRepository)
+        {
+            _HoldLotInfoRepository = holdLotInfoRepository;
+        }
+
+        
+        public PagedResults QueryWIPData(WIPProfileInput input)
+        {
+         
+            var pageResults = _HoldLotInfoRepository.GetWIPData(input);
+            return pageResults;
+
+        }
+
+        public PagedResults QueryLotForecast(LotForecastInput input)
+        {
+            var pageResults = _HoldLotInfoRepository.GetLotForecast(input);
+            return pageResults;
+        }
+
+
+        public ChartOption GetCHART(WIPProfileInput input)
+        {
+
+            var summaryData = _HoldLotInfoRepository.QueryCWIP(input);
+            var percentData1 = _HoldLotInfoRepository.QueryMOVE(input);
+            var percentData2 = _HoldLotInfoRepository.QueryHoldWIP(input);
+            string chartTitle = "WIPProfile Chart";
+
+            string firstAxisName = "MOVE QTY";
+            string secondAxisName = "WIP";
+
+            ChartOption optionSummary = percentData1.ToChartOption(ChartType.Line, chartTitle, "", "name", "Series", "value", "", ChartDirection.Vertical, "", firstAxisName);
+            ChartOption addtionOption = summaryData.AddToChartOption(optionSummary,ChartType.Line,  "name", "Series", "value", "", "", firstAxisName);
+            ChartOption addtionOption1 = percentData2.AddToChartOption(optionSummary, ChartType.Bar, "name", "Series", "value", "", "", secondAxisName);
+            addtionOption1.xAxis[0].axisLabel = new AxisLabel() { interval = 0 };
+            addtionOption1.title.x = "left";
+
+            return addtionOption1;
+
+        }
+
+    }
+}

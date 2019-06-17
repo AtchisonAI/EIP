@@ -1,0 +1,134 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using EIP.Common.Entities.Paging;
+using System.Data;
+using System.IO;
+
+namespace HiDM.Reporting.DataAccess
+{
+    public class EQPUpTimeTotalRepository : ReportingRepository, IEQPUpTimeTotalRepository
+    {
+        public PagedResults QueryMonthTotalInfo(Models.QueryTotalInput InfoInput)
+        {
+            string filter = string.Empty;
+            if (InfoInput.YearDate != null && InfoInput.YearDate.Length > 0)
+            {
+                filter = string.Format("AND Year IN ('{0}') ", InfoInput.YearDate);
+            }
+            
+
+            string sql = string.Format(sMonthTotalInfo, filter);
+            return base.PagingQueryDataTable(sql, InfoInput);
+        }
+
+
+        public PagedResults QueryYearTotalInfo(Models.QueryTotalInput InfoInput)
+        {
+            string filter = string.Empty;
+            if (InfoInput.YearDate != null && InfoInput.YearDate.Length > 0)
+            {
+                filter = string.Format("AND Year IN ('{0}') ", InfoInput.YearDate);
+            }
+
+            string sql = string.Format(sYearTotalInfo, filter);
+            return base.PagingQueryDataTable(sql, InfoInput);
+        }
+
+
+        public PagedResults QuerySingleInfo(Models.QueryTotalInput InfoInput)
+        {
+            string filter = string.Empty;
+            string filter1 = string.Empty;
+            string filter2 = string.Empty;
+
+            if (InfoInput.YearDate != null && InfoInput.YearDate.Length > 0)
+            {
+                filter1 = string.Format("AND Year IN ('{0}') ", InfoInput.YearDate);
+            }
+      
+            if (InfoInput.StateGrp != null && InfoInput.StateGrp.Length > 0)
+            {
+                filter2 = string.Format("AND State IN ('{0}') ", InfoInput.StateGrp);
+            }
+
+            filter = filter1 + filter2;
+
+            string sql = string.Format(sSingleInfo, filter);
+            return base.PagingQueryDataTable(sql, InfoInput);
+        }
+
+
+        public PagedResults QueryToolInfo(Models.QueryTotalInput InfoInput)
+        {
+            string filter = string.Empty;
+            string filter1 = string.Empty;
+            string filter2 = string.Empty;
+
+            if (InfoInput.YearDate != null && InfoInput.YearDate.Length > 0)
+            {
+                filter1 = string.Format("AND Year IN ('{0}') ", InfoInput.YearDate);
+            }
+
+            if (InfoInput.EqpID != null && InfoInput.EqpID.Length > 0)
+            {
+                filter2 = string.Format("AND equipmentname IN ('{0}') ", InfoInput.EqpID);
+            }
+
+            filter = filter1 + filter2;
+
+            string sql = string.Format(sToolInfo, filter);
+            return base.PagingQueryDataTable(sql, InfoInput);
+        }
+
+        private string sMonthTotalInfo = @"select t.* , 
+       @rowNumber, @recordCount
+       FROM V_EQPUPTIME01 t
+       where 1=1 {0}";
+
+        private string sYearTotalInfo = @"select t.*  ,
+       @rowNumber, @recordCount
+       FROM V_EQPUPTIME02 t
+       where 1=1 {0}";
+
+        private string sSingleInfo = @"select t.*  ,
+       @rowNumber, @recordCount
+       FROM V_EQPUPTIME03 t
+       where 1=1 {0}";
+
+
+        private string sToolInfo = @"select TT.* ,
+       @rowNumber, @recordCount
+       FROM (
+SELECT DECODE(STATEGRP.MODIFIABLE, 'T', 'Up time', 'F', 'Down time') status,
+       EQP.VALDATA,
+       NVL(STATE.HOUR, 0) HOUR,
+       NVL(round(STATE.HOUR / STATE.TOTAL, 4) * 100, 0) PERCENT,
+       EQUIPMENTNAME,
+       STATEGRP.MODIFIABLE
+  FROM FWEXTPICKLISTS_PN2M EQP
+  LEFT JOIN V_EQPUPTIME04 STATE ON EQP.VALDATA = STATE.EQPSTATEGROUP {0}
+  LEFT JOIN (SELECT DISTINCT EXT.EQPSTATEGROUP, STATE.MODIFIABLE
+               FROM FABEQPSTATEEXT EXT
+               LEFT JOIN FWEQPSTATE STATE ON STATE.SYSID = EXT.PARENT
+              where state.name not in
+                    ('4200_SD_ROUTINE_QUALIFICATION', '0000_OFF1')) STATEGRP ON STATEGRP.EQPSTATEGROUP =
+                                                                                EQP.VALDATA
+ WHERE EQP.VALDATA NOT LIKE 'PORT%'
+   AND EQP.linkname = 'EqpStateGroups'
+ UNION 
+SELECT DECODE(T1.STATUS,'T','Total Up time','F','Total Down time') status,
+   ' ' AS valdata,
+    T1.STS_TOTAL HOUR,
+    round(T1.STS_TOTAL/T1.TOTAL,4)*100 PERCENT ,
+    T1.EQUIPMENTNAME,
+    T1.STATUS MODIFIABLE 
+    FROM V_EQPUPTIME04 T1 WHERE 1=1 {0}
+    ) TT
+     ORDER BY TT.MODIFIABLE DESC, TT.VALDATA DESC ";
+
+
+    }
+}

@@ -1,0 +1,89 @@
+﻿@using EIP.Common.Entities
+@using EIP.Common.Entities.Dtos
+@using EIP.Web.DataUsers.Helpers
+
+@{
+    ViewBag.Title = "SummaryScrap";
+    ViewBag.Require = "reporting-Scrap-Summaryscrap";
+    Layout = "~/Views/Shared/_LayoutPageBaseList.cshtml";
+}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class=" panel panel-primary">
+                <div class="panel-heading text-center">
+                    <h3 class="panel-title">SummaryScrap</h3>
+                </div>
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                     
+                        <div class="row" style="padding-top:10px;">
+                            <div class="col-lg-4">
+                                <div class="col-sm-4 text-right">
+                                    <label for="startDate" class="control-label text-right"><span class="need">*</span>查询区间起:</label>
+                                </div>
+                                <div class="col-sm-8 text-left">
+                                    <input id="StartTime" type="text" name="StartTime" readonly style="background-color:white;" class="form-control manualfilter text-left" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',readOnly:true})" />
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="col-sm-4 text-right">
+                                    <label for="EndDate" class="control-label text-right"><span class="need">*</span>查询区间起止:</label>
+                                </div>
+                                <div class="col-sm-8 text-left">
+                                    <input id="EndTime" type="text" name="EndTime" style="background-color:white;" readonly class="form-control manualfilter text-left" onfocus="WdatePicker({dateFmt:'yyyy-MM-dd HH:mm:ss',readOnly:true})" /><br>
+                                </div>
+                            </div>
+                     
+                        </div>
+                          <div class="row" style="padding-top:10px;">
+                            
+                            <div class="col-lg-4">
+                                <div class="col-sm-4 text-left">
+                                    <label for="MWD" class="control-label text-right"><span class="need">*</span>By Monthly/Weekly/Qarterly:</label>
+                                </div>
+                                <div class="col-sm-4">
+                                    <select id="Bydate" name="Bydate" class="form-control manualfilter select2">
+                                        <option value="M">Monthly</option>
+                                        <option value="W">Weekly</option>
+                                        <option value="Q">Qarterly</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" style="padding-top:10px;">
+
+                            <div class="form-group col-lg-10">
+
+                            </div>
+                            <div class="form-group col-lg-2">
+                                <div class="col-sm-6">
+                                    <input type="button" name="btn_select_box" value="搜 索" class="btn btn-primary pull-right" />
+                                </div>
+                                <div class="col-sm-6">
+                                    <input type="button" name="btn_reset_box" value="重 置" class="btn pull-right">
+                                </div>
+                            </div>
+
+                        </div>
+                    </form>
+                 </div>
+            </div>
+        </div>
+    </div>
+   <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-info">
+                
+                    <div class="panel-heading">
+                        <h3 class="panel-title">Production</h3>
+                    </div>
+                    <div class="panel-body" id="listpnlbody">
+                        <table id="list" class="grid"></table>
+                        <div id="pager"></div>
+                    </div>
+                </div>
+            
+           </div>
+    </div>
+</div>

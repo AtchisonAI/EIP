@@ -1,0 +1,61 @@
+﻿define(['reportingbootstrap'],
+    function (abc) {
+
+        initGird();
+        size = UtilWindowHeightWidth();
+        if ($('#RECORD_DATE').val() !== '') {
+            $("[name='btn_select_box']").click();
+        }
+    });
+
+var $grid,
+    size; //宽高
+
+
+function ValidateInput() {
+    if ($('#RECORD_DATE').val() == '') {
+        DialogTipsMsgError('请输入日期!', 5000);
+        $('#RECORD_DATE').focus();
+        return false;
+    }
+    return true;
+}
+
+function initGird() {
+    $grid = $("#list").jgridview(
+        {
+            datatype: "local",
+            multiselect: false,
+            loadonce: false,
+            shrinkToFit: true,
+            url: '/Reporting/EQPGroupPerformance/GetEQPGroupWipDetail',
+            colModel: [
+                //{
+                //    name: "SYSID", width: 130, fixed: true, hidden: true
+                //},
+                { label: "Productid", name: "PRODUCTID", width: 120, fixed: true },
+                { label: "Lotid", name: "LOTID", width: 120, fixed: true },
+                { label: "Lot Type", name: "LOTTYPE", width: 120, fixed: true },
+                { label: "Stage", name: "STAGENAME", width: 120, fixed: true },
+                { label: "Priority", name: "PRIORITY", width: 120, fixed: true },
+                { label: "Qty", name: "WAFERQTY", width: 120, fixed: true },
+                { label: "Status", name: "STATUS", width: 120, fixed: true },
+                { label: "Area", name: "AREA", width: 120, fixed: true },
+                { label: "Capability", name: "CAPABILITY", width: 120, fixed: true },
+                { label: "Eqptype", name: "EQPTYPE", width: 120, fixed: true },
+                { label: "Eqpid", name: "EQPID", width: 120, fixed: true },
+                { label: "Rtime", name: "RTIME", width: 120, fixed: true },
+                { label: "Htime", name: "HTIME", width: 120, fixed: true },
+                { label: "Qtime", name: "QTIME", width: 120, fixed: true },
+                { label: "Hold Comment", name: "HOLDCOMMENT", width: 130, fixed: true },
+                { label: "Hold Reason", name: "HOLDREASON", width: 120, fixed: true },
+                { label: "Recipename", name: "RECIPENAME", width: 120, fixed: true }
+            ],
+            sortname: "PRODUCTID",
+
+            height: '500px',
+            sortorder: "desc",
+            additionalLoadCompleteAction: function (json) {
+            }
+        });
+}

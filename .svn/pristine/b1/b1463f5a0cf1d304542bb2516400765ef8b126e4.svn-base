@@ -1,0 +1,119 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using EIP.Common.Entities.Paging;
+using HiDM.Reporting.Models;
+using HiDM.Reporting.Models.EQPStatusMonitor;
+
+namespace HiDM.Reporting.DataAccess
+{
+    public class WIPProfileRepository : ReportingRepository, IWIPProfileRepository
+    {
+        public PagedResults GetWIPData(WIPProfileInput input)
+        {
+            string filter = string.Empty;
+            if(input.IsIncludeEngLots == false)
+            {
+                filter = " and lot.lottype = 'P' ";
+            }
+
+            string filter2 = string.Empty;
+            if (input.Product != null && input.Product.Length > 0)
+            {
+                filter2 = string.Format(" AND ProductName IN ('{0}') ", input.Product);
+            }
+
+            string filter3 = string.Empty;
+            
+            if (input.ByDate == "UPTONOW")
+            {
+                System.DateTime currentTime = new System.DateTime();
+                if (currentTime.Hour >= 8)
+                {
+                    filter3 = " AND to_date(substr(hs.timeheresince,0,15),'yyyy-mm-dd hh24:mi:ss') between to_date(to_char(sysdate,'yyyy-mm-dd') || ' 08:00:00','yyyy-mm-dd hh24:mi:ss') to to_date(sysdate , 'yyyy-mm-dd hh24:mi:ss') ";
+                }
+                else
+                {
+                    filter3 = " AND to_date(substr(hs.timeheresince,0,15),'yyyy-mm-dd hh24:mi:ss') between to_date(to_char(sysdate-1,'yyyy-mm-dd') || ' 08:00:00','yyyy-mm-dd hh24:mi:ss') to to_date(sysdate , 'yyyy-mm-dd hh24:mi:ss') ";
+                }
+            }
+            else
+            {
+                filter3 = " AND to_date(substr(hs.timeheresince,0,15),'yyyy-mm-dd hh24:mi:ss') between to_date(to_char(:StartTime-1,'yyyy-mm-dd') || ' 08:00:00','yyyy-mm-dd hh24:mi:ss') to to_date(to_char(:StartTime,'yyyy-mm-dd') || ' 08:00:00','yyyy-mm-dd hh24:mi:ss')";
+            }
+
+            string sql = string.Format(listSQL, filter, filter2, filter3);
+            return base.PagingQueryDataTable(sql, input);
+
+        }
+
+        public string listSQL = @" 
+SELECT LOT.APPID,
+       hs.stepid,
+       hs.location,
+       -- hs.processoperation,
+       hs.processoperationid,
+       hs.stepseq,
+       hs.stagename,
+       FWh.Productid,
+       hs.trackinqty,
+       hs.trackoutqty,
+       fwte.capability,
+       lot.priority,
+       FWTE.Recipeid,
+       --   to_date(substr(hs.timeheresince,0,15),'yyyy-mm-dd hh24:mi:ss') as arrivetime,
+       --   to_date(substr(hs.trackintime,0,15),'yyyy-mm-dd hh24:mi:ss') as trackintime,
+       --   to_date(substr(hs.trackouttime,0,15),'yyyy-mm-dd hh24:mi:ss') as trackouttime,
+       round((to_date(substr(hs.trackintime, 0, 15), 'yyyymmdd hh24miss') -
+             to_date(substr(hs.timeheresince, 0, 15), 'yyyymmdd hh24miss')) * 1440,
+             2) queuetime,
+       round((to_date(substr(hs.trackouttime, 0, 15), 'yyyymmdd hh24miss') -
+             to_date(substr(hs.trackintime, 0, 15), 'yyyymmdd hh24miss')) * 1440,
+             2) runtime,
+       sum(round((nvl(to_date(substr(r.holdtime, 0, 15),
+                              'yyyymmdd hh24miss'),
+                      sysdate) - nvl(to_date(substr(hr.holdtime, 0, 15),
+                                              'yyyyMMdd HH24miss'),
+                                      sysdate)) * 1440,
+                 2)) HoldTime,
+       hr.reason,
+       hr.briefdescription,
+       @rowNumber, @recordCount
+
+  FROM fwwipstephistory hs
+  join fwlot lot on hs.lotobject = lot.sysid
+  left join fwhold hd on hd.wipstepref = hs.sysid
+  left join fwholdrelease hr on hd.holdrelease = hr.sysid
+  left join fwholdrelease r on hr.holdsysid = r.holdsysid
+                           and hr.sysid != r.sysid --release time
+  left join FwWipHistory FWH on hs.sysid = FWH.wipTxn
+  left join FWWIPTRANSACTION FWT on FWT.WipStepRef = HS.SYSID
+  left join FabWipTransactionExt FWTE on FWT.sysid = fwte.parent
+
+ @where   {0} {1} {2}
+
+ group by LOT.APPID,
+          hs.stepid,
+          hs.location,
+          --   hs.processoperation,
+          hs.processoperationid,
+          hs.stepseq,
+          hs.stagename,
+          FWh.Productid,
+          hs.trackinqty,
+          hs.trackoutqty,
+          fwte.capability,
+          hs.timeheresince,
+          hs.trackintime,
+          hs.trackouttime,
+          lot.priority,
+          FWTE.Recipeid,
+          hr.reason,
+          hr.briefdescription;
+ 
+";
+    }
+}

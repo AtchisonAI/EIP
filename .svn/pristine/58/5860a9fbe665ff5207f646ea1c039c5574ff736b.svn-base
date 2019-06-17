@@ -1,0 +1,141 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using EIP.Common.Entities.Paging;
+using System.Data;
+
+namespace HiDM.Reporting.DataAccess
+{
+    public class QueryInfoRepository:ReportingRepository, IQueryInfoRepository
+    {
+        public PagedResults GetQueryInfoList(Models.QueryInfoInput InfoInput)
+        {
+            string filter2 = string.Empty;
+            if (InfoInput.ProductID != null && InfoInput.ProductID.Length > 0)
+            {
+                filter2 = string.Format("AND xx.ProductID IN ('{0}') ", InfoInput.ProductID);
+            }
+            string filter3 = string.Empty;
+            if (InfoInput.Priority != null && InfoInput.Priority.Length > 0)
+            {
+                filter3 = string.Format("AND xx.Priority IN ('{0}') ", InfoInput.Priority);
+            }
+            string filter4 = string.Empty;
+            if (InfoInput.InternalPriority != null && InfoInput.InternalPriority.Length > 0)
+            {
+                filter4 = string.Format("AND xx.InternalPriority IN ('{0}') ", InfoInput.InternalPriority);
+            }
+            string filter = string.Empty;
+            //  filter = filter2 + filter3 + filter4;
+            filter = filter2 + filter3;
+
+
+            string filter1 = string.Empty;
+            string filter5 = string.Empty;
+            if (InfoInput.Bydate != null && InfoInput.Bydate.Length > 0)
+            {
+                if (InfoInput.Bydate == "M")
+                {
+                    filter1 = "select substr(xx.v_date,1,6) as v_date";
+                    filter5 = "group by substr(xx.v_date,1,6)";
+                }
+                if (InfoInput.Bydate == "W")
+                {
+                    filter1 = "select to_char(to_date(xx.v_date,'yyyymmdd'),'YY'||'WW') as v_date";
+                    filter5 = "group by to_char(to_date(xx.v_date,'yyyymmdd'),'YY'||'WW')";
+                }
+                if (InfoInput.Bydate == "D")
+                {
+                    filter1 = "SELECT xx.v_date ";
+                    filter5 = "group by  xx.v_date";
+                }
+            }
+
+            //listSQL = filter1 + listSQL + filter5;
+            string sql = string.Format(listSQL, filter1,filter,filter5);
+            return base.PagingQueryDataTable(sql, InfoInput);
+        }
+
+
+        public PagedResults GetQueryInfoList1(Models.QueryInfoInput InfoInput)
+        {
+            string filter2 = string.Empty;
+            if (InfoInput.ProductID != null && InfoInput.ProductID.Length > 0)
+            {
+                filter2 = string.Format("AND xx.ProductNAME IN ('{0}') ", InfoInput.ProductID);
+            }
+            string filter3 = string.Empty;
+            if (InfoInput.Priority != null && InfoInput.Priority.Length > 0)
+            {
+                filter3 = string.Format("AND xx.Priority IN ('{0}') ", InfoInput.Priority);
+            }
+            string filter4 = string.Empty;
+            if (InfoInput.InternalPriority != null && InfoInput.InternalPriority.Length > 0)
+            {
+                filter4 = string.Format("AND xx.InternalPriority IN ('{0}') ", InfoInput.InternalPriority);
+            }
+            string filter = string.Empty;
+            //  filter = filter2 + filter3 + filter4;
+            filter = filter2 + filter3;
+
+
+            string filter1 = string.Empty;
+            string filter5 = string.Empty;
+            if (InfoInput.Bydate != null && InfoInput.Bydate.Length > 0)
+            {
+                if (InfoInput.Bydate == "M")
+                {
+                    filter1 = "select substr(xx.v_date,1,6) as v_date";
+                    filter5 = " group by substr(xx.v_date,1,6)";
+                }
+                if (InfoInput.Bydate == "W")
+                {
+                    filter1 = "select to_char(to_date(xx.v_date,'yyyymmdd'),'YY'||'WW') as v_date";
+                    filter5 = " group by to_char(to_date(xx.v_date,'yyyymmdd'),'YY'||'WW')";
+                }
+                if (InfoInput.Bydate == "D")
+                {
+                    filter1 = "SELECT xx.v_date ";
+                    filter5 = " group by  xx.v_date";
+                }
+            }
+
+            //listSQL = filter1 + listSQL + filter5;
+            string sql = string.Format(listSQL1, filter1, filter, filter5);
+            return base.PagingQueryDataTable(sql, InfoInput);
+        }
+
+        private string listSQL = @"select tmp.v_date,tmp.boh,tmp.eoh,tmp.stagemove,tmp.TR,@rowNumber, @recordCount  from ({0}, nvl(sum(xx.BOH),0) as boh, nvl(sum(xx.EOH),0) as eoh, nvl(sum(f.movellotqty),0) as stagemove,decode(nvl(sum(xx.EOH),0),0,0,round(nvl(sum(f.movellotqty),0)/nvl(sum(xx.EOH),0),2))as TR
+  from (select t.record_date as v_date, sum(t.wip_lot) as BOH, sum(t1.wip_lot) as EOH,t.productname, t.priority
+          from rpt_tbl_wip_info_6am t
+          left join rpt_tbl_wip_info_6am t1 on t.lot_type = t1.lot_type
+                                           and t.productname =
+                                               t1.productname
+                                           and t.lot_status = t1.lot_status
+                                           and t.priority = t1.priority
+                                           and t1.record_date =
+                                               (t.record_date - 1)
+         where t.lot_type = 'P' and to_date(t.record_date||'080000','yyyy-mm-dd hh24:mi:ss') between to_date(:StartTime,'yyyy-mm-dd hh24:mi:ss') and to_date(:EndTime,'yyyy-mm-dd hh24:mi:ss')
+         group by t.record_date,t.productname, t.priority) xx,
+       RPT_TBL_PART_INFO f
+ where f.record_date = xx.v_date {1} {2}) tmp  ";
+
+
+        private string listSQL1 = @"select tmp.v_date,tmp.boh,tmp.eoh,tmp.stagemove,tmp.TR,@rowNumber, @recordCount  from ({0}, nvl(sum(xx.BOH),0) as boh, nvl(sum(xx.EOH),0) as eoh, nvl(sum(f.movellotqty),0) as stagemove,decode(nvl(sum(xx.EOH),0),0,0,round(nvl(sum(f.movellotqty),0)/nvl(sum(xx.EOH),0),2))as TR
+  from (select t.record_date as v_date, sum(t.wip_lot) as BOH, sum(t1.wip_lot) as EOH,t.productname, t.priority
+          from rpt_tbl_wip_info_6am t
+          left join rpt_tbl_wip_info_6am t1 on t.lot_type = t1.lot_type
+                                           and t.productname =
+                                               t1.productname
+                                           and t.lot_status = t1.lot_status
+                                           and t.priority = t1.priority
+                                           and t1.record_date =
+                                               (t.record_date - 1)
+         where t.lot_type <> 'P' and to_date(t.record_date||'080000','yyyy-mm-dd hh24:mi:ss') between to_date(:StartTime,'yyyy-mm-dd hh24:mi:ss') and to_date(:EndTime,'yyyy-mm-dd hh24:mi:ss')
+         group by t.record_date,t.productname, t.priority) xx,
+       RPT_TBL_PART_INFO f
+ where f.record_date = xx.v_date  {1} {2}) tmp  ";
+    }
+}

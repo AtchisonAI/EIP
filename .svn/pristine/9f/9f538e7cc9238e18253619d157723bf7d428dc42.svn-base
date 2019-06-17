@@ -1,0 +1,384 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using EIP.Common.Entities.Paging;
+using System.Data;
+using System.Globalization;
+
+
+namespace HiDM.Reporting.DataAccess
+{
+    public class ProductIndicesRepository : ReportingRepository, IProductIndicesRepository
+    {
+        public PagedResults GetQueryInfoList(Models.ProductIndicesInput InfoInput)
+        {
+            return base.PagingQueryDataTable(listSQL, InfoInput);
+        }
+        public PagedResults GetQueryInfoList1(Models.ProductIndicesInput InfoInput)
+        {
+            return base.PagingQueryDataTable(listSQL1, InfoInput);
+        }
+        public PagedResults GetQueryInfoList2(Models.ProductIndicesInput InfoInput)
+        {
+            return base.PagingQueryDataTable(listSQL2, InfoInput);
+        }
+
+        public PagedResults GetQueryInfoList3(Models.ProductIndicesInput InfoInput)
+        {
+            return base.PagingQueryDataTable(listSQL3, InfoInput);
+        }
+
+        public PagedResults GetQueryInfoList4(Models.ProductIndicesInput InfoInput)
+        {
+            return base.PagingQueryDataTable(listSQL4, InfoInput);
+        }
+
+        private string listSQL = @"SELECT t.*,  @rowNumber, @recordCount
+                                      FROM (SELECT rtpi.record_date,
+                                                   rtpi.lottype,
+                                                   rtpi.boh,
+                                                   rtpi2.boh eoh,
+                                                   SUM(rtpi.movelotqty) movelotqty,
+                                                   SUM(rtpi.movewaferqty) movewaferqty,
+                                                   SUM(rtpi.waferstartqty) waferstartqty,
+                                                   SUM(rtpi.shipqty) shipqty,
+                                                   SUM(rtpi.unshipqty) unshipqty,
+                                                   SUM(rtpi.bankinqty) bankinqty,
+                                                   SUM(rtpi.bankoutqty) bankoutqty,
+                                                   SUM(rtpi.scrapqty) scrapqty,
+                                                   SUM(rtpi.unscrapqty) unscrapqty,
+                                                   rtpi.yield,
+                                                   SUM(rtpi.holdqty) holdqty,
+                                                   SUM(rtpi.reworkqty) reworkqty
+                                              FROM rpt_tbl_part_info rtpi
+                                              LEFT JOIN rpt_tbl_part_info rtpi2 ON to_date(rtpi.record_date,
+                                                                                           'yyyymmdd') =
+                                                                                   to_date(rtpi2.record_date,
+                                                                                           'yyyymmdd') + 1
+                                             WHERE to_date(rtpi.record_date, 'yyyymmdd') BETWEEN
+                                                   to_date(:starttime, 'yyyymmdd') AND
+                                                   to_date(:endtime, 'yyyymmdd')
+                                               AND rtpi.lottype = 'P'
+                                             GROUP BY rtpi.record_date,
+                                                      rtpi.lottype,
+                                                      rtpi.boh,
+                                                      rtpi2.boh,
+                                                      rtpi.yield) t";
+
+        private string listSQL1 = @"SELECT t.*,  @rowNumber, @recordCount
+                                          FROM (SELECT rtpi.record_date,
+                                                       rtpi.lottype,
+                                                       rtpi.boh,
+                                                       rtpi2.boh eoh,
+                                                       SUM(rtpi.movelotqty) movelotqty,
+                                                       SUM(rtpi.movewaferqty) movewaferqty,
+                                                       SUM(rtpi.waferstartqty) waferstartqty,
+                                                       SUM(rtpi.shipqty) shipqty,
+                                                       SUM(rtpi.unshipqty) unshipqty,
+                                                       SUM(rtpi.bankinqty) bankinqty,
+                                                       SUM(rtpi.bankoutqty) bankoutqty,
+                                                       SUM(rtpi.scrapqty) scrapqty,
+                                                       SUM(rtpi.unscrapqty) unscrapqty,
+                                                       rtpi.yield,
+                                                       SUM(rtpi.holdqty) holdqty,
+                                                       SUM(rtpi.reworkqty) reworkqty
+                                                  FROM rpt_tbl_part_info rtpi
+                                                  LEFT JOIN rpt_tbl_part_info rtpi2 ON to_date(rtpi.record_date,
+                                                                                               'yyyymmdd') =
+                                                                                       to_date(rtpi2.record_date,
+                                                                                               'yyyymmdd') + 1
+                                                 WHERE to_date(rtpi.record_date, 'yyyymmdd') BETWEEN
+                                                       to_date(:starttime, 'yyyymmdd') AND
+                                                       to_date(:endtime, 'yyyymmdd')
+                                                   AND rtpi.lottype = 'EP'
+                                                 GROUP BY rtpi.record_date,
+                                                          rtpi.lottype,
+                                                          rtpi.boh,
+                                                          rtpi2.boh,
+                                                          rtpi.yield) t";
+
+        private string listSQL2 = @"SELECT t.*,  @rowNumber, @recordCount
+                                          FROM (SELECT rtpi.record_date,
+                                                       rtpi.lottype,
+                                                       rtpi.boh,
+                                                       rtpi2.boh eoh,
+                                                       SUM(rtpi.movelotqty) movelotqty,
+                                                       SUM(rtpi.movewaferqty) movewaferqty,
+                                                       SUM(rtpi.waferstartqty) waferstartqty,
+                                                       SUM(rtpi.shipqty) shipqty,
+                                                       SUM(rtpi.unshipqty) unshipqty,
+                                                       SUM(rtpi.bankinqty) bankinqty,
+                                                       SUM(rtpi.bankoutqty) bankoutqty,
+                                                       SUM(rtpi.scrapqty) scrapqty,
+                                                       SUM(rtpi.unscrapqty) unscrapqty,
+                                                       rtpi.yield,
+                                                       SUM(rtpi.holdqty) holdqty,
+                                                       SUM(rtpi.reworkqty) reworkqty
+                                                  FROM rpt_tbl_part_info rtpi
+                                                  LEFT JOIN rpt_tbl_part_info rtpi2 ON to_date(rtpi.record_date,
+                                                                                               'yyyymmdd') =
+                                                                                       to_date(rtpi2.record_date,
+                                                                                               'yyyymmdd') + 1
+                                                 WHERE to_date(rtpi.record_date, 'yyyymmdd') BETWEEN
+                                                       to_date(:starttime, 'yyyymmdd') AND
+                                                       to_date(:endtime, 'yyyymmdd')
+                                                   AND rtpi.lottype = 'ET'
+                                                 GROUP BY rtpi.record_date,
+                                                          rtpi.lottype,
+                                                          rtpi.boh,
+                                                          rtpi2.boh,
+                                                          rtpi.yield) t";
+
+        private string listSQL3 = @"SELECT t.*,  @rowNumber, @recordCount
+                                          FROM (SELECT rtpi.record_date,
+                                                       rtpi.lottype,
+                                                       rtpi.boh,
+                                                       rtpi2.boh eoh,
+                                                       SUM(rtpi.movelotqty) movelotqty,
+                                                       SUM(rtpi.movewaferqty) movewaferqty,
+                                                       SUM(rtpi.waferstartqty) waferstartqty,
+                                                       SUM(rtpi.shipqty) shipqty,
+                                                       SUM(rtpi.unshipqty) unshipqty,
+                                                       SUM(rtpi.bankinqty) bankinqty,
+                                                       SUM(rtpi.bankoutqty) bankoutqty,
+                                                       SUM(rtpi.scrapqty) scrapqty,
+                                                       SUM(rtpi.unscrapqty) unscrapqty,
+                                                       rtpi.yield,
+                                                       SUM(rtpi.holdqty) holdqty,
+                                                       SUM(rtpi.reworkqty) reworkqty
+                                                  FROM rpt_tbl_part_info rtpi
+                                                  LEFT JOIN rpt_tbl_part_info rtpi2 ON to_date(rtpi.record_date,
+                                                                                               'yyyymmdd') =
+                                                                                       to_date(rtpi2.record_date,
+                                                                                               'yyyymmdd') + 1
+                                                 WHERE to_date(rtpi.record_date, 'yyyymmdd') BETWEEN
+                                                       to_date(:starttime, 'yyyymmdd') AND
+                                                       to_date(:endtime, 'yyyymmdd')
+                                                   AND rtpi.lottype = 'CC'
+                                                 GROUP BY rtpi.record_date,
+                                                          rtpi.lottype,
+                                                          rtpi.boh,
+                                                          rtpi2.boh,
+                                                          rtpi.yield) t";
+
+        private string listSQL4 = @"SELECT t.*,  @rowNumber, @recordCount
+                                          FROM (SELECT rtpi.record_date,
+                                                       rtpi.lottype,
+                                                       rtpi.boh,
+                                                       rtpi2.boh eoh,
+                                                       SUM(rtpi.movelotqty) movelotqty,
+                                                       SUM(rtpi.movewaferqty) movewaferqty,
+                                                       SUM(rtpi.waferstartqty) waferstartqty,
+                                                       SUM(rtpi.shipqty) shipqty,
+                                                       SUM(rtpi.unshipqty) unshipqty,
+                                                       SUM(rtpi.bankinqty) bankinqty,
+                                                       SUM(rtpi.bankoutqty) bankoutqty,
+                                                       SUM(rtpi.scrapqty) scrapqty,
+                                                       SUM(rtpi.unscrapqty) unscrapqty,
+                                                       rtpi.yield,
+                                                       SUM(rtpi.holdqty) holdqty,
+                                                       SUM(rtpi.reworkqty) reworkqty
+                                                  FROM rpt_tbl_part_info rtpi
+                                                  LEFT JOIN rpt_tbl_part_info rtpi2 ON to_date(rtpi.record_date,
+                                                                                               'yyyymmdd') =
+                                                                                       to_date(rtpi2.record_date,
+                                                                                               'yyyymmdd') + 1
+                                                 WHERE to_date(rtpi.record_date, 'yyyymmdd') BETWEEN
+                                                       to_date(:starttime, 'yyyymmdd') AND
+                                                       to_date(:endtime, 'yyyymmdd')
+                                                 GROUP BY rtpi.record_date,
+                                                          rtpi.lottype,
+                                                          rtpi.boh,
+                                                          rtpi2.boh,
+                                                          rtpi.yield) t";
+
+        public PagedResults GetDetails(Models.SubPageInput InfoInput)
+        {
+            string filter0 = string.Empty;
+            if (InfoInput.PART == "Production")
+            {
+                filter0 = "AND t.lot_type = 'P'";
+            }
+            else if (InfoInput.PART == "Engineering")
+            {
+                filter0 = "AND t.lot_type = 'EP'";
+            }
+            else if (InfoInput.PART == "Backup")
+            {
+                filter0 = "AND t.lot_type = 'ET'";
+            }
+            else if (InfoInput.PART == "NPW")
+            {
+                filter0 = "AND t.lot_type = 'CC'";
+            }
+            else if (InfoInput.PART == "Total")
+            {
+                filter0 = "AND 1=1";
+            }
+
+            DateTime dt;
+            string filter1 = string.Empty;
+            string filter2 = string.Empty;
+            string filter = string.Empty;
+            string sql = string.Empty;
+
+            filter1 = InfoInput.RECORD_DATE;
+
+            DateTimeFormatInfo dtFormat = new DateTimeFormatInfo();
+
+            dtFormat.ShortDatePattern = "yyyy/MM/dd";
+
+            filter2 = Convert.ToDateTime(filter1.Substring(0, 4) + '/' + filter1.Substring(4, 2) + '/'
+                                + filter1.Substring(6, 2), dtFormat).AddDays(1).ToShortDateString().Replace("/", "");
+
+
+            //filter2 = filter1 + 1;
+            filter1 = filter1 + "080000";
+            filter2 = filter2 + "080000";
+
+            if (InfoInput.ACTIVITY == "LotStart")
+            {
+
+                filter = "And replace(SUBSTR(T.TXNTIMESTAMP, 0, 15),' ','') between " + "\'" + filter1 + "\'" + " and " + "\'" + filter2 + "\'" + filter0;
+
+                 sql = string.Format(StartDetailsSQL, filter);
+            }
+            else if (InfoInput.ACTIVITY == "Scrap")
+            {
+                filter = "and replace(SUBSTR(T.TXNTIMESTAMP, 0, 15),' ','') between " + "\'" + filter1 + "\'" + " and " + "\'" + filter2 + "\'" + filter0;
+
+                sql = string.Format(ScrapDetailsSQL, filter);
+            }
+            else if (InfoInput.ACTIVITY == "Unscrap")
+            {
+                filter = "and replace(SUBSTR(T.TXNTIMESTAMP, 0, 15),' ','') between " + "\'" + filter1 + "\'" + " and " + "\'" + filter2 + "\'" + filter0;
+
+                sql = string.Format(UnscrapDetailsSQL, filter);
+            }
+            else if (InfoInput.ACTIVITY == "Hold")
+            {
+                filter = "and replace(SUBSTR(T.TXNTIMESTAMP, 0, 15),' ','') between " + "\'" + filter1 + "\'" + " and " + "\'" + filter2 + "\'" + filter0;
+
+                sql = string.Format(HoldDetailsSQL, filter);
+            }
+            else if (InfoInput.ACTIVITY == "Rework")
+            {
+                filter = "and replace(SUBSTR(T.TXNTIMESTAMP, 0, 15),' ','') between " + "\'" + filter1 + "\'" + " and " + "\'" + filter2 + "\'" + filter0;
+
+                sql = string.Format(ReworkDetailsSQL, filter);
+            }
+
+            return base.PagingQueryDataTable(sql, InfoInput);
+
+        }
+
+        private string StartDetailsSQL = @"SELECT t.*,
+                                               @rowNumber, @recordCount
+                                              FROM (SELECT hs.wipid lot_id,
+                                                           lot.lottype lot_type,
+                                                           lot.priority priority,
+                                                           '0' parent_id,
+                                                           lot.productname || '.' || productrevision part_id,
+                                                           hs.userid event_user,
+                                                           hs.txntimestamp,
+                                                           hs.lotqtyout start_qty
+                                                  FROM fwwiptransaction hs
+                                                  LEFT JOIN fwlot lot ON hs.lotobject = lot.sysid
+                                                  LEFT JOIN fwwipstephistory ws ON lot.sysid = ws.lotobject
+                                                                               AND ws.sysid = hs.wipstepref
+                                                  LEFT JOIN fwscraplot sl ON lot.sysid = sl.lotobject
+                                                                         AND sl.sysid = hs.wipstepref
+                                                 WHERE lot.lottype != 'CAR'
+                                                   AND lot.lottype != 'Material'
+                                                   AND hs.activity = 'LotStart') t where 1=1 {0} ";
+
+
+
+        private string ScrapDetailsSQL = @"SELECT t.*,
+                                               @rowNumber, @recordCount
+                                              FROM (SELECT fsl.wipid lot_id,
+                                                           fl.lottype lot_type,
+                                                           fs.scrapqty scrap_qty,
+                                                           fsp.keytype scrap_code,
+                                                           fc.detaileddescription scrap_comment,
+                                                           fl.priority,
+                                                           fl.productname || '.' || fl.productrevision part_id,
+                                                           fs.occursinstep stepid,
+                                                           fsl.userid,
+                                                           fsl.txntimestamp
+                                                      FROM fwscraplot fsl
+                                                      LEFT JOIN fwlot fl ON fsl.lotobject = fl.sysid
+                                                      LEFT JOIN fwscraplot_n2m fsln ON fsln.fromid = fsl.sysid
+                                                                                   AND fsln.linkname = 'scrapCollection'
+                                                      LEFT JOIN fwscrap fs ON fs.sysid = fsln.toid
+                                                      LEFT JOIN fwcomment fc ON fsl.txncomment = fc.sysid
+                                                      LEFT JOIN fwscrap_pn2m fsp ON fs.sysid = fsp.fromid
+                                                                                AND fsp.linkname = 'reasons') t where 1=1 {0} ";
+
+ 
+
+        private string UnscrapDetailsSQL = @"SELECT t.*, @rowNumber, @recordCount
+                                              FROM (SELECT fusl.wipid lot_id,
+                                                           fl.lottype lot_type,
+                                                           fs.scrapqty unscrap_qty,
+                                                           fsp.keytype unscrap_code,
+                                                           fc.detaileddescription unscrap_comment,
+                                                           fl.priority,
+                                                           fl.productname || '.' || fl.productrevision part_id,
+                                                           fs.occursinstep stepid,
+                                                           fusl.userid,
+                                                           fusl.txntimestamp
+                                                      FROM fwunscraplot fusl
+                                                      LEFT JOIN fwlot fl ON fl.sysid = fusl.lotobject
+                                                      LEFT JOIN fwunscraplot_n2m fusln ON fusln.fromid = fusl.sysid
+                                                                                      AND fusln.linkname = 'scrapCollection'
+                                                      LEFT JOIN fwscrap fs ON fs.sysid = fusln.toid
+                                                      LEFT JOIN fwcomment fc ON fusl.txncomment = fc.sysid
+                                                      LEFT JOIN fwscrap_pn2m fsp ON fs.sysid = fsp.fromid
+                                                                                AND fsp.linkname = 'reasons') t where 1=1 {0} ";
+
+
+
+        private string HoldDetailsSQL = @"SELECT t.*, @rowNumber, @recordCount
+                                              FROM ( SELECT fh.wipid lot_id,
+                                                            fl.lottype lot_type,
+                                                            fl.priority,
+                                                            fl.productname || '.' || fl.productrevision part_id,
+                                                            fh.lotqtyout hold_qty,
+                                                            fhr.reason hold_code,
+                                                            fhr.briefdescription hold_comment,
+                                                            fh.userid,
+                                                            fhr.holdtime txntimestamp
+                                                       FROM fwhold fh
+                                                       LEFT JOIN fwlot fl ON fl.sysid = fh.lotobject
+                                                       LEFT JOIN fwholdrelease fhr ON fh.holdrelease = fhr.sysid ) t where 1=1 {0} ";
+
+
+
+        private string ReworkDetailsSQL = @"SELECT t.*, @rowNumber, @recordCount
+                                              FROM (SELECT loths.wipid lotid,
+                                                           lot.lottype lot_type,
+                                                           lot.priority,
+                                                           lot.productname || '.' || productrevision partid,
+                                                           fwsh.stagename stage,
+                                                           fwsh.handle,
+                                                           fwsh.processoperationseq,
+                                                           fwsh.processoperationid,
+                                                           fwsh.stepseq,
+                                                           fwsh.stepid stepid,
+                                                           loths.lotqtyout reworkqty,
+                                                           loths.txntimestamp txntimestamp
+                                                      FROM fwwiptransaction loths
+                                                      LEFT JOIN fwlot lot ON loths.lotobject = lot.sysid
+                                                      LEFT JOIN fwwipstephistory fwsh ON lot.sysid = fwsh.lotobject
+                                                                                   AND fwsh.sysid = loths.wipstepref
+                                                     WHERE lot.lottype != 'CAR'
+                                                       AND lot.lottype != 'Material'
+                                                       AND loths.activity = 'Rework') t where 1=1 {0} ";
+
+
+    }
+
+}

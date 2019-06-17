@@ -1,0 +1,39 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using HiDM.Reporting.DataAccess;
+using EIP.Common.Entities.Paging;
+using HiDM.FactoryWorks.TibcoRV;
+using HiDM.Reporting.Models;
+using HiDM.FactoryWorks.Messages;
+using EIP.Common.Entities.ECharts;
+using EIP.Common.Entities;
+
+namespace HiDM.Reporting.Business
+{
+    public class WuQiLogic : IWuQiLogic
+    {
+        private IWuQiRepository _WuQiRepository;
+
+        public WuQiLogic(IWuQiRepository repository)
+        {
+            _WuQiRepository = repository;
+        }
+
+        public PagedResults QueryLotInfo(Models.WuQiInput input)
+        {
+            if (input.ProductName.IsNullOrEmpty())
+            {
+                throw new ParameterRequiredException("ProductName");
+            }
+            var pageResults = _WuQiRepository.GetLotInfoList(input);
+            var summaryData = _WuQiRepository.GetLotStatusSummary(input);
+            ChartOption option = summaryData.ToChartOption(ChartType.Bar, "", "", "Status", "Series", "CNT", "asd", ChartDirection.Vertical);
+            pageResults.ExtraDatas.Add("Summary", option);
+            return pageResults;
+        }
+
+    }
+}

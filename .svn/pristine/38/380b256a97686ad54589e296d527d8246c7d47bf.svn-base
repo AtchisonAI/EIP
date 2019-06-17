@@ -1,0 +1,88 @@
+﻿define(['reportingbootstrap'],
+    function (abc) {
+        initSelect();
+        initGird();
+        initGirdAdd();
+        size = UtilWindowHeightWidth();
+        
+    });
+
+function ValidateInput() {
+  //  alert($('#selProductID').val());
+    
+    if ($('#StartTime').val() == '') {
+        DialogTipsMsgError('请输入StartTime!', 5000);
+        $('#StartTime').focus();
+        return false;
+    }
+    if ($('#EndTime').val() == '') {
+        DialogTipsMsgError('请输入EndTime!', 5000);
+        $('#EndTime').focus();
+        return false;
+    }
+    return true;
+}
+
+function initSelect() {
+
+    $("#Bydate").select2({
+        language: "zh-CN", //设置 提示语言
+        width: "100%", //设置下拉框的宽度
+        maximumSelectionLength:1,
+        placeholder: "请单击或输入数据过滤，选择By Monthly/Weekly/Quarter！",
+        multiple: true,
+        allowClear: true,//允许清空
+        escapeMarkup: function (markup) { return markup; } // let our custom formatter work
+        //minimumInputLength: 1
+    });
+}
+
+
+
+
+
+var size; //宽高
+
+
+function loadGraph(data) {
+    
+    myChart.setOption(data);
+    myChart1.setOption(data);
+}
+
+//初始化表格
+function initGird() {
+   var $grid = $("#list").jgridview(
+        {
+            datatype: "local",
+            multiselect: false,
+            loadonce: false,
+            shrinkToFit: true,
+            url: '/Reporting/Scrap/Summaryscrap',
+            colModel: [
+                { label: "lot_id", name: "LOT_ID", width: 100, fixed: true},
+                { label: "scrap_qty", name: "SCRAP_QTY",  width: 100, fixed: true },
+                { label: "scrap_code", name: "SCRAP_CODE",  width: 100, fixed: true },
+                { label: "scrap_comment", name: "SCRAP_COMMENT",  width: 100, fixed: true },
+                { label: "productname", name: "PRODUCTNAME", width: 100, fixed: true },
+                { label: "productrevision", name: "PRODUCTREVISION", width: 100, fixed: true },
+                { label: "stepname", name: "STEPNAME", width: 100, fixed: true },
+                { label: "stepid", name: "STEPID", width: 100, fixed: true },
+                { label: "userid", name: "USERID", width: 100, fixed: true },
+                { label: "location", name: "LOCATION", width: 100, fixed: true }
+            ],
+           // sortname: "LOT_ID",
+           height: '500px',
+            sortorder: "asc",
+            additionalLoadCompleteAction: function (json) {
+                     
+            }   
+        });
+    $("#list").setGroupHeaders({
+        useColSpanStyle: true,    //表头是否合并行
+        groupHeaders: [
+            { startColumnName: 'V_DATE', numberOfColumns: 5, titleText: '<div align="center"><span>Product</span></div> ', textAlign: "center" }
+        ]
+    });
+
+}

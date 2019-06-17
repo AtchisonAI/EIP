@@ -1,0 +1,502 @@
+﻿define(['reportingbootstrap'],
+    function (abc) {
+        initSelect();
+        initGird();
+        initRadio();
+        getLastDayOption();
+        size = UtilWindowHeightWidth();
+    });
+
+function initRadio() {
+    $('input[type=radio][name=timeOption]').change(function () {
+        var $startTime = $('#StartTime');
+        var $endTime = $('#EndTime');
+
+      //  if (typeof timerGetUpToNowOption !== 'undefined') {
+     //       clearInterval(getLastDayOption);
+    //    }
+       
+        
+        $startTime.attr("readonly", true);
+        $endTime.attr("readonly", true); 
+
+        $startTime.removeAttr('style');
+        $endTime.removeAttr('style');
+      
+        
+         if (this.value == '2') {
+             getLastDayOption();
+
+             
+        } else if (this.value == '3') {
+         //   getUpToNowOption();
+            $startTime.attr("readonly", false);
+            $startTime.css("background-color", 'white');
+            $endTime.attr("readonly", false);
+            $endTime.css("background-color", 'white');
+        }
+    });
+
+    //timerGetUpToNowOption = setInterval(getLastDayOption, 1000);
+}
+var timerGetUpToNowOption;
+
+function getUpToNowOption() {
+    var $startTime = $('#StartTime');
+    var $endTime = $('#EndTime');
+    var timeNow = getTimeNow();
+    var todayStart = getTodayStartTime(timeNow);
+    $startTime.val(todayStart.Format('yyyy-MM-dd hh:mm:ss'));
+    $endTime.val(timeNow.Format('yyyy-MM-dd hh:mm:ss'));
+}
+
+function getLastDayOption() {
+    var $startTime = $('#StartTime');
+    var $endTime = $('#EndTime');
+    var timeNow = getTimeNow();
+    var lastDayEnd = getTodayStartTime(timeNow);
+    var lastStart = getLastDayStart(lastDayEnd);
+    $startTime.val(lastStart.Format('yyyy-MM-dd hh:mm:ss'));
+    $endTime.val(lastDayEnd.Format('yyyy-MM-dd hh:mm:ss'));
+}
+
+
+var oneday = 1000 * 60 * 60 * 24;
+
+function getLastDayStart(todayStartTime) {
+    var lastDayStart = new Date(todayStartTime - oneday);
+    return lastDayStart;
+}
+
+function getTodayStartTime(timeNow) {
+    var currentDate = new Date(timeNow); //Current Date + 8 Hours
+    currentDate.setHours(8);//UTC Time Compare
+    currentDate.setMinutes(0);
+    currentDate.setSeconds(0);
+    currentDate.setMilliseconds(0);
+    //If Current Time > Current Date + 8 Hours Return Current Date + 8 Hours
+    if (timeNow > currentDate) {
+        return currentDate;
+    } else { //Return Current Date - 1 Day + 8 Hours
+        return new Date(currentDate - oneday)
+    }
+}
+
+function getTimeNow() {
+    return new Date();
+}
+
+function initSelect() {
+
+    $("#selArea").select2({
+        language: "zh-CN", //设置 提示语言
+        width: "100%", //设置下拉框的宽度
+        placeholder: "请单击或输入数据过滤，选择Area！",
+        maximumSelectionLength: 2,  //设置最多可以选择多少项
+        multiple: true,//设置是否可以多选
+        allowClear: true,//允许清空
+        ajax: {
+            url: "/Common/Common/QueryAreaSelectList",//获取数据的地址
+            dataType: 'json',
+            delay: 250,//按键之后多久才提交后台进行查询,
+            processResults: function (result, params) {//获取到后台数据后，进行解析
+                params.page = params.page || 1;
+                if (result.isSuccess) {
+                    return {
+                        results: result.data
+                    };
+                } else {
+                    return {
+                        results: null
+                    };
+                }
+            },
+            cache: true
+        },
+        escapeMarkup: function (markup) { return markup; } // let our custom formatter work
+        //minimumInputLength: 1
+    });
+
+    $("#selArea").on("select2:unselect", function (e) {//绑定选中事件
+        $("#selEQPCap").val(null).trigger('change');
+        $("#selEQPType").val(null).trigger('change');
+    });
+
+    $("#selArea").on("select2:select", function (e) {//绑定取消选中事件
+        $("#selEQPCap").val(null).trigger('change');
+        $("#selEQPType").val(null).trigger('change');
+    });
+
+    $("#selEQPCap").on("select2:unselect", function (e) {//绑定选中事件
+        $("#selEQPType").val(null).trigger('change');
+    });
+
+    $("#selEQPCap").on("select2:select", function (e) {//绑定取消选中事件
+        $("#selEQPType").val(null).trigger('change');
+    });
+
+
+    //远程筛选
+    $("#selEQPCap").select2({
+        language: "zh-CN", //设置 提示语言
+        width: "100%", //设置下拉框的宽度
+        placeholder: "请单击或输入数据过滤，选择EQP Cap！",
+        maximumSelectionLength: 4,  //设置最多可以选择多少项
+        multiple: true,
+        allowClear: true,//允许清空
+        ajax: {
+            url: "/Common/Common/JJQueryEQPCapSelectList",
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                //控件联动，获取到选择的productfamily，传递给后台，过滤product
+                var area;
+                if ($("#selArea").val() !== null) {
+                    area = $("#selArea").val().join("','");
+                }
+
+                return {
+                    area: area,
+                    q: params.term
+                };
+            },
+            processResults: function (result, params) {
+                params.page = params.page || 1;
+                if (result.isSuccess) {
+                    return {
+                        results: result.data
+                    };
+                } else {
+                    return {
+                        results: null
+                    };
+                }
+            },
+            cache: true
+        },
+        escapeMarkup: function (markup) { return markup; } // let our custom formatter work
+        //minimumInputLength: 1
+    });
+
+
+    //远程筛选
+    $("#selEQPType").select2({
+        language: "zh-CN", //设置 提示语言
+        width: "100%", //设置下拉框的宽度
+        placeholder: "请单击或输入数据过滤，选择EQP Type！",
+        maximumSelectionLength: 4,  //设置最多可以选择多少项
+        multiple: true,
+        allowClear: true,//允许清空
+        ajax: {
+            url: "/Common/Common/JJQueryEQPTypeSelectList",
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {
+                //控件联动，获取到选择的productfamily，传递给后台，过滤product
+                var area;
+                if ($("#selArea").val() !== null) {
+                    area = $("#selArea").val().join("','");
+                }
+                
+                var eqpCap;
+                if ($("#selEQPCap").val() !== null) {
+                    eqpCap = $("#selEQPCap").val().join("','");
+                }
+
+                return {
+                    area: area,
+                    eqpCap: eqpCap,
+                    q: params.term,
+                    page: params.page || 1//当前页数
+                };
+            },
+            processResults: function (result, params) {
+                params.page = params.page || 1;
+                if (result.isSuccess) {
+                    return {
+                        results: result.data,
+                        pagination: {
+                            more: (params.page * 10) < result.totalCount//分页条件：当前已显示数量<总数
+                        }
+                    };
+                } else {
+                    return {
+                        results: null
+                    };
+                }
+            },
+            cache: true
+        },
+        escapeMarkup: function (markup) { return markup; } // let our custom formatter work
+        //minimumInputLength: 1
+    });
+}
+
+var size;//宽高
+
+
+//重置流程
+//ResetBefore
+//如果 ResetBefore 返回 true
+//  自动执行clearCondition();
+//  自动执行clearGrids();
+//  自动执行clearCharts();
+//  AdditionalReset
+
+function ResetBefore() {
+    //自动重置之前，执行，如果不希望执行自动重置逻辑，则返回false
+}
+
+//function AdditionalReset() {
+//    chartData = null;
+//    clickedEQP = null;
+//    $('#listDetail').jqGrid("clearGridData");
+//    $('#listEQPGroupPerformance').jqGrid("clearGridData");
+//    $('#chartLegend').html('');
+
+//    $('#rdoUpToNow').prop('checked', 'checked');
+//    var $startTime = $('#StartTime');
+//    var $endTime = $('#EndTime');
+
+//    if (typeof timerGetUpToNowOption !== 'undefined') {
+//        clearInterval(timerGetUpToNowOption);
+//    }
+
+//    $startTime.attr("readonly", true);
+//    $endTime.attr("readonly", true);
+
+//    $startTime.removeAttr('style');
+//    $endTime.removeAttr('style');
+//    timerGetUpToNowOption = setInterval(getUpToNowOption, 500);
+    
+
+//    return true;
+//}
+
+//提交流程
+//ValidateInput
+//如果 ValidateInput 返回 true
+//  BeforeSearchClick
+//  如果 BeforeSearchClick 返回 true
+//      自动执行获取条件
+//      自动执行所有class为grid的元素的reload事件
+//      AfterSearchClick
+function ValidateInput() {
+    //客户端条件验证，如果不通过，返回false
+
+    var fromTime = new Date($('#StartTime').val());
+    var endTime = new Date($('#EndTime').val());
+    if (endTime <= fromTime) {
+        DialogTipsMsgError('结束时间必须大于开始时间!', 5000);
+        $('#StartTime').focus();
+        return false;
+    }
+
+    //if ($('#selEQPType').val() == null || $('#selEQPType').val().length ===0) {
+    //    DialogTipsMsgError('请选择需要查询的设备类型!', 5000);
+    //    $('#selEQPType').focus();
+    //    return false;
+    //}
+}
+
+function AfterSearchClick() {
+
+}
+
+//默认执行class为grid和chart的自适应方法
+function windowResized() {
+
+    $('#list').setGridWidth($('#list').parents('.ui-jqgrid').parent().width());
+}
+
+
+function loadChartLegend(data) {
+    var rowDiv;
+    var idx = 0;
+    $('#chartLegend').html('');
+    $.each(data, function (status, color) {
+        if (idx % 4 === 0) {
+            rowDiv = $('<div class = "row"></div>');
+            $('#chartLegend').append(rowDiv);
+        }
+
+        rowDiv.append($('<div class="col-sm-3 text-center" style="padding-top:5px;"><div class="input-group"><div class="input-group-addon"  style="background-color:' + color + '";></div><input readonly type="text" class="form-control"  value="' + status + '" ></input> </div> </div>'));
+        idx++;
+    });
+}
+
+
+function renderItem(params, api) {
+    var categoryIndex = api.value(0);
+    var start = api.coord([api.value(1), categoryIndex]);
+    var end = api.coord([api.value(2), categoryIndex]);
+    var height = api.size([0, 1])[1] * 0.6;
+
+    return {
+        type: 'rect',
+        shape: echarts.graphic.clipRectByRect({
+            x: start[0],
+            y: start[1] - height / 2,
+            width: end[0] - start[0],
+            height: height
+        }, {
+                x: params.coordSys.x,
+                y: params.coordSys.y,
+                width: params.coordSys.width,
+                height: params.coordSys.height
+            }),
+        style: api.style()
+    };
+}
+
+
+var chartData;
+
+function loadGraph(data) {
+    chartData = data;
+    var option = {
+        tooltip: {
+            formatter: function (params) {
+                return params.marker + params.name + ': ' + params.value[4] + ' m';
+            }
+        },
+        legend: {
+            orient: 'vertical',
+            x: 'right'
+        },
+        dataZoom: [{
+            type: 'slider',
+            filterMode: 'weakFilter',
+            showDataShadow: false,
+            top: 500,
+            height: 10,
+            borderColor: 'transparent',
+            backgroundColor: '#e2e2e2',
+            handleIcon: 'M10.7,11.9H9.3c-4.9,0.3-8.8,4.4-8.8,9.4c0,5,3.9,9.1,8.8,9.4h1.3c4.9-0.3,8.8-4.4,8.8-9.4C19.5,16.3,15.6,12.2,10.7,11.9z M13.3,24.4H6.7v-1.2h6.6z M13.3,22H6.7v-1.2h6.6z M13.3,19.6H6.7v-1.2h6.6z', // jshint ignore:line
+            handleSize: 20,
+            handleStyle: {
+                shadowBlur: 6,
+                shadowOffsetX: 1,
+                shadowOffsetY: 2,
+                shadowColor: '#aaa'
+            },
+            labelFormatter: ''
+        }, {
+            type: 'inside',
+            filterMode: 'weakFilter'
+        }],
+        grid: {
+            height: 400
+        },
+        xAxis: {
+            min: data.StartDate,
+            max: data.EndDate,
+            scale: true,
+            axisLabel: {
+                formatter: function (val) {
+                    return new Date(val).Format("yyyy-MM-dd hh:mm:ss")
+                }
+            }
+        },
+        yAxis: {
+            data: data.categories
+        },
+        series: [{
+            type: 'custom',
+            renderItem: renderItem,
+            itemStyle: {
+                normal: {
+                    opacity: 0.8
+                }
+            },
+            encode: {
+                x: [1, 2],
+                y: 0
+            },
+            data: data.data
+        }]
+    };
+
+    var myChart = echarts.getInstanceByDom(document.getElementById('browserAnalysis'));
+    myChart.setOption(option);
+
+    myChart.on('click', function (params) {
+
+        clickedEQP = new Object();
+        clickedEQP.EQPName = params.value[5];
+        clickedEQP.ParentEQPName = params.value[6];
+        clickedEQP.StartTime = new Date(params.value[1]).Format('yyyyMMdd hhmmss000');
+        clickedEQP.EndTime = new Date(params.value[2]).Format('yyyyMMdd hhmmss000');
+        
+        ShowDetails();
+    });
+}
+
+var clickedEQP;
+
+
+
+
+
+
+//初始化表格
+function initGird() {
+
+    $("#list").jgridview(
+        {
+            datatype: "local",
+            multiselect: false,
+            loadonce: false,
+            shrinkToFit: true,
+            //pager: 'pager',
+            url: '/Reporting/EQPGroupPerformance/GetEQPGroupPerformance',
+            colModel: [
+                { label: "Date", name: "RECORD_DATE", width: 130, fixed: true },
+                { label: "Area", name: "AREA", width: 110, fixed: true },
+                {
+                    label: "Capability", name: "CAPABILITY", width: 100, fixed: true, formatter: function (cellValue, options, rowdata, action) {
+                        return "<a herf='javascript:(0)' onclick='showWipMoveDetail(\"" + rowdata.RECORD_DATE + "\",\"" + rowdata.AREA + "\",\"" + rowdata.CAPABILITY + "\",\"" + rowdata.EQPTYPE +"\")' ><font color='blue'><u>" + rowdata.CAPABILITY + "</u></blue></a>";
+                    }
+                },
+                { label: "Eqptype", name: "EQPTYPE", width: 110, fixed: true },
+                {
+                    label: "WIP(Wafer)", name: "WIP", width: 110, fixed: true, formatter: function (cellValue, options, rowdata, action) {
+                        return "<a herf='javascript:(0)' onclick='showWipDetail(\"" + rowdata.RECORD_DATE + "\",\"" + rowdata.AREA + "\",\"" + rowdata.CAPABILITY + "\",\"" + rowdata.EQPTYPE + "\")' ><font color='blue'><u>" + rowdata.WIP + "</u></blue></a>";
+                    }
+                },
+                {
+                    label: "MOVE(Lot)", name: "MOVELOTQTY", width: 110, fixed: true, formatter: function (cellValue, options, rowdata, action) {
+                        return "<a herf='javascript:(0)' onclick='showMoveDetail(\"" + rowdata.RECORD_DATE + "\",\"" + rowdata.AREA + "\",\"" + rowdata.CAPABILITY + "\",\"" + rowdata.EQPTYPE + "\")' ><font color='blue'><u>" + rowdata.MOVELOTQTY + "</u></blue></a>";
+                    }
+                },
+                { label: "Mrate", name: "MRATE", width: 110, fixed: true },
+                { label: "Maxmove", name: "MAXMOVE", width: 110, fixed: true },
+                { label: "Avgmove", name: "AVGMOVE", width: 110, fixed: true },
+                { label: "Qtime", name: "QTIME", width: 110, fixed: true },
+                { label: "Htime", name: "HTIME", width: 110, fixed: true }
+            ],
+            sortname: "t.record_date",
+            height: '462px',
+            sortorder: "asc",
+            additionalLoadCompleteAction: function (json) {
+            }
+        });
+
+
+   // $('#list').jqGrid('setGridParam', { datatype: 'json' });
+}
+
+
+
+function showWipDetail(RECORD_DATE, AREA, CAPABILITY, EQPTYPE) {
+    ArtDialogOpen("/Reporting/EqpGroupPerformance/WipDetail?DATE=" + RECORD_DATE + "&AREA=" + AREA + "&CAPABILITY=" + CAPABILITY + "&EQPTYPE=" + EQPTYPE, "WIP Detail-" + RECORD_DATE, true, 750, 1200, true);
+}
+
+
+function showMoveDetail(RECORD_DATE, AREA, CAPABILITY, EQPTYPE) {
+    ArtDialogOpen("/Reporting/EqpGroupPerformance/MoveDetail?DATE=" + RECORD_DATE + "&AREA=" + AREA + "&CAPABILITY=" + CAPABILITY + "&EQPTYPE=" + EQPTYPE, "WIP Detail-" + RECORD_DATE, true, 750, 1200, true);
+}
+
+function showWipMoveDetail(RECORD_DATE, AREA, CAPABILITY, EQPTYPE) {
+    ArtDialogOpen("/Reporting/EqpGroupPerformance/MoveDetail?DATE=" + RECORD_DATE + "&AREA=" + AREA + "&CAPABILITY=" + CAPABILITY + "&EQPTYPE=" + EQPTYPE, "WIP Detail-" + RECORD_DATE, true, 750, 1200, true);
+}

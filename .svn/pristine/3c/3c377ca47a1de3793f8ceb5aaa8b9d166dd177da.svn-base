@@ -1,0 +1,128 @@
+﻿@using EIP.Common.Entities
+@using EIP.Common.Entities.Dtos
+@using EIP.Web.DataUsers.Helpers
+
+@{
+    ViewBag.Title = "EQPUPTimeRpt";
+    ViewBag.Require = "reporting-EAPUpTimeReport-Query";
+    Layout = "~/Views/Shared/_LayoutPageBaseList.cshtml";
+}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class=" panel panel-primary">
+                <div class="panel-body">
+                    <form class="form-horizontal">
+                        <div class="row">
+                            <div class="col-lg-4">
+                                <div class="col-sm-4 text-right">
+                                    <label for="Year" class="control-label text-right"><span class="need">*</span>年份:</label>
+                                </div>
+                                <div class="col-sm-8 text-left">
+                                    <input id="YearDate" type="text" name="YearDate" readonly style="background-color:white;" class="form-control manualfilter text-left" onfocus="WdatePicker({dateFmt:'yyyy',readOnly:true})" />
+
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="col-sm-4 text-right">
+                                    <label for="State" class="control-label text-right">
+                                        <span class="need">*</span>
+                                        State:
+                                    </label>
+                                </div>
+                                <div class="col-sm-8 text-left">
+                                    <select id="StateGrp" name="StateGrp" class="form-control manualfilter select2"><option></option></select>
+                                </div>
+                            </div>
+                            <div class="col-lg-4">
+                                <div class="col-sm-4 text-right">
+                                    <label for="EQP" class="control-label text-right">
+                                        <span class="need">*</span>
+                                        Equipment id:
+                                    </label>
+                                </div>
+                                <div class="col-sm-8 text-left">
+                                    <select id="EqpID" name="EqpID" class="form-control manualfilter select2"><option></option></select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row" style="padding-top:10px;">
+                            <div class="col-lg-10"></div>
+                            <div class="col-lg-2">
+                                <div class="col-sm-6">
+                                    <input type="button" name="btn_select_box" value="搜 索" class="btn btn-primary pull-right" />
+                                </div>
+                                <div class="col-sm-6">
+                                    <input type="button" name="btn_reset_box" value="重 置" class="btn pull-right">
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Total Status</h3><small>按月汇总</small>
+                </div>
+                <div class="panel-body" id="listpnlbody">
+                    <div class="col-lg-12">
+                        <table id="list" class="grid"></table>
+                        <div id="pager"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Total Status</h3><small>按半年汇总</small>
+                </div>
+                <div class="panel-body" id="listpnlbody">
+                    <div class="col-lg-12">
+                        <table id="list1" class="grid"></table>
+                        <div id="pager1"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Single Item Status</h3>
+                </div>
+                <div class="panel-body" id="listpnlbody">
+                    <div class="col-lg-12">
+                        <table id="list2" class="grid"></table>
+                        <div id="pager2"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Tool Status</h3>
+                </div>
+                <div class="panel-body" id="listpnlbody">
+                    <div class="col-lg-12">
+                        <table id="list3" class="grid"></table>
+                        <div id="pager3"></div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

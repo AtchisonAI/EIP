@@ -1,0 +1,54 @@
+﻿define(['reportingbootstrap'],
+    function (abc) {
+       
+        initGird();
+        size = UtilWindowHeightWidth();
+        if ($('#RECORD_DATE').val() !== '') {
+            $("[name='btn_select_box']").click();
+        }
+    });
+
+var $grid,
+    size; //宽高
+
+
+function ValidateInput() {
+    if ($('#RECORD_DATE').val() == '') {
+        DialogTipsMsgError('请输入日期!', 5000);
+        $('#RECORD_DATE').focus();
+        return false;
+    }
+
+    return true;
+}
+
+function initGird() {
+    $grid = $("#list").jgridview(
+        {
+            datatype: "local",
+            multiselect: false,
+            loadonce: false,
+            shrinkToFit: true,
+            url: '/Reporting/ProductIndices/QueryStartDetails',
+            colModel: [
+                //{
+                //    name: "SYSID", width: 130, fixed: true, hidden: true
+                //},
+                { label: "LOT_ID",    name: "LOT_ID", width: 130, fixed: true },
+                { label: "LOT_TYPE",  name: "LOT_TYPE", width: 130, fixed: true },
+                { label: "PARENT_ID", name: "PARENT_ID", width: 130, fixed: true },
+                { label: "PRIORITY",  name: "PRIORITY", width: 130, fixed: true },
+                { label: "PART_ID",   name: "PART_ID", width: 130, fixed: true },
+                { label: "EVENT_USER", name: "EVENT_USER", width: 130, fixed: true },
+                { label: "EVENT_TIME", name: "EVENT_TIME", width: 130, fixed: true },
+                { label: "START_QTY",  name: "START_QTY", width: 130, fixed: true }
+                
+      
+            ],
+            sortname: "HS.WIPID",
+            height: '500px',
+            sortorder: "desc",
+            additionalLoadCompleteAction: function (json) {
+            }
+        });
+}

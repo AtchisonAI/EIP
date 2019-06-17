@@ -1,0 +1,27 @@
+﻿using EIP.Common.Entities.CustomAttributes;
+using EIP.Common.Entities.Dtos;
+using EIP.Common.Entities.Paging;
+
+namespace HiDM.Reporting.Models
+{
+    public class QueryTotalInput : QueryParam,IInputDto
+    {
+        
+        [Param]
+        public string Year { get; set; }
+
+        [Param]
+        public string StateGrp { get; set; }
+
+        [Param]
+        public string Tool { get; set; }
+
+
+        //[Param]
+        //public string Weekly { get; set; }
+
+        //[Param]
+        //public string Daily { get; set; }
+
+    }
+}

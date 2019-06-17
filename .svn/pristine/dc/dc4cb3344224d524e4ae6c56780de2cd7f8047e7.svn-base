@@ -1,0 +1,92 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{5CAAFAAE-DB6A-47C3-BB15-3A1A8F8E3A6D}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>HiDM.Reporting.Models</RootNamespace>
+    <AssemblyName>HiDM.Reporting.Models</AssemblyName>
+    <TargetFrameworkVersion>v4.5</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <TargetFrameworkProfile />
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="EIP.Common.Core, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Lib\EIP.Common.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="EIP.Common.Entities, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\..\..\Lib\EIP.Common.Entities.dll</HintPath>
+    </Reference>
+    <Reference Include="HiDM.FactoryWorks.Common">
+      <HintPath>..\..\..\Lib\HiDM.FactoryWorks.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="HiDM.FactoryWorks.TibcoRV">
+      <HintPath>..\..\..\Lib\HiDM.FactoryWorks.TibcoRV.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Demo\Dtos\BaseHoldInfo.cs" />
+    <Compile Include="Demo\Dtos\LotHoldInfoInput.cs" />
+    <Compile Include="EQPUptimeRpt\QueryTotalInput.cs" />
+    <Compile Include="HoldWIPReport\BaseInfo.cs" />
+    <Compile Include="HoldWIPReport\ReleaseInput.cs" />
+    <Compile Include="HoldWIPReport\WIPHoldInfoInput.cs" />
+    <Compile Include="Demo\Dtos\LwfTest\LotStsInput.cs" />
+    <Compile Include="Demo\Dtos\LwfTest\LotStsOutput.cs" />
+    <Compile Include="Demo\Dtos\ReleaseLotInput.cs" />
+    <Compile Include="EmployInfo\EmployInfo.cs" />
+    <Compile Include="EmployInfo\QueryEmloyInfoOutput.cs" />
+    <Compile Include="EmployInfo\QueryEmployInfoInput.cs" />
+    <Compile Include="Jason\ProductNameInput.cs" />
+    <Compile Include="LotStepHistory\LotStepHistoryInput.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="WIPMoveReport\QueryInfoInput.cs" />
+    <Compile Include="XuTao\LotHistoryInput.cs" />
+    <Compile Include="XuTao\XuTaoInput.cs" />
+    <Compile Include="ZhangLu\ZhangLuInput.cs" />
+  </ItemGroup>
+  <ItemGroup />
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>xcopy "$(TargetDir)$(TargetName).dll" "$(SolutionDir)lib\" /y
+xcopy "$(TargetDir)$(TargetName).pdb" "$(SolutionDir)lib\" /y</PostBuildEvent>
+  </PropertyGroup>
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

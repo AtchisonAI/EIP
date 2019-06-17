@@ -1,0 +1,77 @@
+﻿@using EIP.Common.Entities
+@using EIP.Common.Entities.Dtos
+@using EIP.Web.DataUsers.Helpers
+
+@{
+    ViewBag.Title = "WIPMoveReport";
+    ViewBag.Require = "reporting-wipmovereport-queryinfo";
+    Layout = "~/Views/Shared/_LayoutPageBaseList.cshtml";
+}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class=" panel panel-primary">
+                <div class="panel-body">
+                    <form class="form-inline form-horizontal">
+                        <div class="row">
+                            <div class="form-group col-lg-4">
+                                <div class="col-sm-4 text-left"><label for="TechID" class="control-label col-sm-4">Tech.ID:</label></div>
+                                <div class="col-sm-8 text-left"><select id="selTechID" name="TechID" class="form-control manualfilter select2 col-sm-8"></select></div>
+                            </div>
+                            <div class="form-group col-lg-4">
+                                <div class="col-sm-4 text-left"><label for="Customer" class="control-label text-right col-sm-4">CustomerID:</label></div>
+                                <div class="col-sm-8 text-left"><select id="selCustomerID" name="CustomerID" class="form-control manualfilter select2 col-sm-8"></select></div>
+                            </div>
+                            <div class="form-group col-lg-4">
+                                <div class="col-sm-4 text-left"><label for="ProductID" class="control-label text-right col-sm-4">ProductID:</label></div>
+                                <div class="col-sm-8 text-left"><select id="selProductID" name="ProductID" class="form-control manualfilter select2 col-sm-8"></select></div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-lg-8">
+                            </div>
+                            <div class="form-group col-lg-4">
+                                <div class="col-sm-4 text-left">
+                                    <label for="Priority" class="control-label text-right col-sm-4">Priority:</label>
+                                </div>
+
+                                <div class="col-sm-8 text-left">
+                                    <select id="selPriority" name="Priority" class="form-control manualfilter select2 col-sm-8">
+                                        <option value="1">1</option>
+                                        <option value="2">2</option>
+                                        <option value="3">3</option>
+                                        <option value="4">4</option>
+                                        <option value="5">5</option>
+                                        <option value="6">6</option>
+                                        <option value="7">7</option>
+                                        <option value="8">8</option>
+                                        <option value="9">9</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </form>
+                 </div>
+
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class=" panel panel-primary">
+                <div class="panel-body">
+                    <form class="form-inline form-horizontal">
+                        <div class="form-group col-lg-12">
+                            <div class="col-sm-6">
+                                <input type="button" name="btn_select_box" value="搜 索" class="btn btn-primary pull-right" />
+                            </div>
+                            <div class="col-sm-6">
+                                <input type="button" name="btn_reset_box" value="重 置" class="btn pull-right">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

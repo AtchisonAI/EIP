@@ -1,0 +1,54 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using HiDM.Reporting.DataAccess;
+using EIP.Common.Entities.Paging;
+using HiDM.FactoryWorks.TibcoRV;
+using HiDM.Reporting.Models;
+using HiDM.FactoryWorks.Messages;
+using EIP.Common.Entities.ECharts;
+using EIP.Common.Entities;
+using System.Data;
+
+namespace HiDM.Reporting.Business
+{
+    public class WIPWaferInOutRptLogic : IWIPWaferInOutRptLogic
+    {
+        private IWIPWaferInOutRptRepository _WIPWaferInOutRptRepository;
+
+        public WIPWaferInOutRptLogic(IWIPWaferInOutRptRepository WIPWaferInOutRptRepository)
+        {
+            _WIPWaferInOutRptRepository = WIPWaferInOutRptRepository;
+        }
+
+
+        public List<ChartOption> GetMonInOutInfo(WIPWaferInOutInput input)
+        {
+
+            List<ChartOption> optionList = new List<ChartOption>();
+
+
+            var summaryData = _WIPWaferInOutRptRepository.QueryMonInWaferInfo(input);
+            var percentData = _WIPWaferInOutRptRepository.QueryMonOutWaferInfo(input);
+            string chartTitle = "Fab In & Fab Out Chart( " + input.sMonthStart + " -" + input.sMonthEnd + " )";
+
+            string firstAxisName = "Fab In";
+            string secondAxisName = "Fab Out";
+
+            ChartOption optionSummary = summaryData.ToChartOption(ChartType.Bar, chartTitle, "", "name", "Series", "value", "HoldLotHist", ChartDirection.Vertical, "", firstAxisName);
+            ChartOption addtionOption = percentData.AddToChartOption(optionSummary, ChartType.Line, "name", "Series", "value", " ", "", secondAxisName);
+           addtionOption.title.x = "left";
+
+            optionList.Add(addtionOption);
+            //pageResults.ExtraDatas.Add("Summary", optionList);
+            return optionList;
+
+        }
+
+
+
+
+    }
+}

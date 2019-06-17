@@ -1,0 +1,64 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using EIP.Common.Entities.Paging;
+using System.Data;
+
+namespace HiDM.Reporting.DataAccess.Demo
+{
+    public class WIPHoldInfoRepository:ReportingRepository,IWIPHoldInfoRepository
+    {
+        public Task<PagedResults> GetWIPInfoList(Models.WIPHoldInfoInput holdInfoInput)
+        {
+
+           return base.PagingQueryAsyncDataTable(listSQL, holdInfoInput);
+        }
+
+        public Task<DataTable> GetWIPSummary(Models.WIPHoldInfoInput holdInfoInput)
+        {
+            string sql = string.Format(summaySQL,"\"name\"", "\"value\"");
+            return base.QueryAsyncDataTable(sql, "Summary", holdInfoInput.GetManualParams());
+        }
+
+        private string listSQL = @"SELECT LOT.APPID LotID,
+       LOT.ProductName,
+       FWS.Handle StepSEQ,
+       FWS.StepName,
+       HR.Reason,
+       HR.ReasonDescription,
+       HR.HOLDTYPE HoldType,
+       HR.COMMENTCODE HoldToOwnerID,
+       NVL(TOEMP.EMPLOYEE_NAME, REPLACE(HR.COMMENTCODE, '@', '')) HoldToOwnerName,
+       NVL(TOEMP.DEPT_CODE, REPLACE(HR.COMMENTCODE, '@', '')) HoldToOwnerDept,
+       HR.BRIEFDESCRIPTION Comments,
+       HR.USERID HoldUserID,
+       EMP.EMPLOYEE_NAME HoldUserName,
+       HR.HOLDTIME HoldTime,
+       LOT.TRANSPORTID CARRIERID,       
+       @rowNumber, @recordCount
+  FROM FWHOLDRELEASE HR
+  LEFT JOIN EMP ON HR.USERID = EMP.ID
+  LEFT JOIN EMP TOEMP ON HR.COMMENTCODE = TOEMP.ID
+  JOIN FWLOT_N2M FLN ON HR.SYSID = FLN.TOID
+                    AND LINKNAME = 'holds'
+  JOIN FWLOT LOT ON FLN.FROMID = LOT.SYSID
+  JOIN FWLOT_N2M FLNS ON LOT.SYSID = FLNS.FROMID AND FLNS.LINKNAME = 'stepCollection'
+  JOIN FWWIPSTEP FWS ON FLNS.TOID = FWS.SYSID
+ @where AND HOLDSYSID IS NULL AND DECODE(NVL(:LOTID,''),'',LOT.APPID,:LOTID) = LOT.APPID
+        AND (DECODE(NVL(:HOLDTODEPT,''),'',TOEMP.DEPT_CODE,:HOLDTODEPT) = TOEMP.DEPT_CODE 
+                OR DECODE(NVL(:HOLDTODEPT,''),'',HR.COMMENTCODE,'@'||:HOLDTODEPT)  = HR.COMMENTCODE)";
+
+        private string summaySQL = @"SELECT HR.Reason {0},
+        COUNT(*) {1}
+  FROM FWHOLDRELEASE HR
+  LEFT JOIN EMP TOEMP ON HR.COMMENTCODE = TOEMP.ID
+  JOIN FWLOT_N2M FLN ON HR.SYSID = FLN.TOID
+                    AND LINKNAME = 'holds'
+  JOIN FWLOT LOT ON FLN.FROMID = LOT.SYSID
+ WHERE HOLDSYSID IS NULL  AND DECODE(NVL(:LOTID,''),'',LOT.APPID,:LOTID) = LOT.APPID
+        AND (DECODE(NVL(:HOLDTODEPT,''),'',TOEMP.DEPT_CODE,:HOLDTODEPT) = TOEMP.DEPT_CODE 
+                OR DECODE(NVL(:HOLDTODEPT,''),'',HR.COMMENTCODE,'@'||:HOLDTODEPT)  = HR.COMMENTCODE) GROUP BY HR.Reason";
+    }
+}

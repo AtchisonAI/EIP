@@ -1,0 +1,59 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using EIP.Common.Entities.Paging;
+using System.Data;
+
+namespace HiDM.Reporting.DataAccess
+{
+    public class EQPUpTimeTotalRepository : ReportingRepository, IEQPUpTimeTotalRepository
+    {
+        public PagedResults QueryMonthTotalInfo(Models.QueryTotalInput InfoInput)
+        {
+            string filter = string.Empty;
+            string sql = string.Format(listSQL, filter);
+            return base.PagingQueryDataTable(sql, InfoInput);
+        }
+
+
+        public PagedResults QueryYearTotalInfo(Models.QueryTotalInput InfoInput)
+        {
+            string filter = string.Empty;
+            string sql = string.Format(listSQL, filter);
+            return base.PagingQueryDataTable(sql, InfoInput);
+        }
+
+
+        public PagedResults QuerySingleInfo(Models.QueryTotalInput InfoInput)
+        {
+            string filter = string.Empty;
+            string sql = string.Format(listSQL, filter);
+            return base.PagingQueryDataTable(sql, InfoInput);
+        }
+
+
+        public PagedResults QueryToolInfo(Models.QueryTotalInput InfoInput)
+        {
+            string filter = string.Empty;
+            string sql = string.Format(listSQL, filter);
+            return base.PagingQueryDataTable(sql, InfoInput);
+        }
+
+        private string listSQL = @",LOTTYPE,BOH,EOH,MOVESTAGE,round(movestage/EOH,2) as TR,
+       @rowNumber, @recordCount
+       FROM TEST_FOR_CAROL_REPORT 
+       where  V_DATE between to_date(:StartTime,'yyyy-mm-dd hh24:mi:ss') and to_date(:EndTime,'yyyy-mm-dd hh24:mi:ss')
+       AND lottype='P' {0} order by v_date";
+
+
+        private string listSQL1 = @",LOTTYPE,BOH,EOH,MOVESTAGE,round(movestage/EOH,2) as TR,
+       @rowNumber, @recordCount
+       FROM TEST_FOR_CAROL_REPORT 
+       @where  V_DATE between to_date(:StartTime,'yyyy-mm-dd hh24:mi:ss') and to_date(:EndTime,'yyyy-mm-dd hh24:mi:ss')
+       AND lottype='F'{0} order by v_date";
+
+
+    }
+}

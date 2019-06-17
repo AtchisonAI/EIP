@@ -1,0 +1,271 @@
+﻿define(['reportingbootstrap'],
+    function (abc) {
+        initSelect();
+        initGird();
+        initGird1();
+        initGird2();
+        initGird3();
+        size = UtilWindowHeightWidth();
+        
+    });
+
+//验证输入查询条件年度字段 mod by lwf
+function ValidateInput() {
+    if ($('#YearDate').val() == '') {
+        DialogTipsMsgError('请选择查询年度!', 5000);
+        $('#YearDate').focus();
+        return false;
+    }
+    return true;
+}
+
+function initSelect() {
+
+    $("#StateGrp").select2({
+        language: "zh-CN", //设置 提示语言
+        width: "100%", //设置下拉框的宽度
+        placeholder: "请单击或输入数据！",
+        //maximumSelectionLength: 1,  //设置最多可以选择多少项
+        //multiple: true,//设置是否可以多选
+        allowClear: true,//允许清空
+
+        ajax: {
+            url: "/Common/Common/QueryEQPStateSelectList",// /Common 文件夹名，/common controllers名字，/query..方法名字 获取数据的地址
+            dataType: 'json',
+            delay: 250,//按键之后多久才提交后台进行查询
+            data: function (params) {//查询参数
+                return {
+                    StateGrp: params.term,//获取输入，提交后台
+                    page: params.page || 1//当前页数
+                };
+            },
+            processResults: function (result, params) {//获取到后台数据后，进行解析
+                params.page = params.page || 1;
+                if (result.isSuccess) {
+                    return {
+                        results: result.data,
+                        pagination: {
+                            more: (params.page * 10) < result.totalCount//分页条件：当前已显示数量<总数
+                        }
+                    };
+                } else {
+                    return {
+                        results: null
+                    };
+                }
+            },
+            cache: true
+        },
+        escapeMarkup: function (markup) { return markup; } // let our custom formatter work
+        //minimumInputLength: 1
+    });
+
+
+
+    //远程筛选
+    $("#EqpID").select2({
+        language: "zh-CN", //设置 提示语言
+        width: "100%", //设置下拉框的宽度
+        placeholder: "请单击或输入数据！",
+        //maximumSelectionLength: 1,  //设置最多可以选择多少项
+        //multiple: true,
+        allowClear: true,//允许清空
+        ajax: {
+            url: "/Common/Common/QueryEQPIDSelectList",
+            dataType: 'json',
+            delay: 250,
+            data: function (params) {               
+                var tmpproductfamily;
+                //if ($("#selTechID").val() !== null) {
+                //    tmpproductfamily = $("#selTechID").val().join("','");
+                //}
+
+                return {
+                    EqpID: params.term,
+                    page: params.page || 1
+                };
+            },
+            processResults: function (result, params) {
+                params.page = params.page || 1;
+                if (result.isSuccess) {
+                    return {
+                        results: result.data,
+                        pagination: {
+                            more: (params.page * 10) < result.totalCount
+                        }
+                    };
+                } else {
+                    return {
+                        results: null
+                    };
+                }
+            },
+            cache: true
+        },
+        escapeMarkup: function (markup) { return markup; } // let our custom formatter work
+        //minimumInputLength: 1
+    });
+
+}
+
+
+
+
+
+var size; //宽高
+
+
+function loadGraph(data) {
+    
+    myChart.setOption(data);
+    myChart1.setOption(data);
+}
+
+//初始化表格
+function initGird() {
+   var $grid = $("#list").jgridview(
+        {
+            datatype: "local",
+            multiselect: false,
+            loadonce: false,
+            shrinkToFit: true,
+            url: '/Reporting/EQPUpTimeRpt/QueryMonthTotalInfo',
+            colModel: [
+                {
+                    label: "Type", name: "COL", width: 130, fixed: true, frozen: true ,
+                    cellattr: function (rowId, val, rawObject, cm, rdata) {
+                        //判断是否符合条件
+                        return " style='color:red;font-weight:bold;'";
+                    }
+                },
+                { label: "Jan", name: "C01", width: 130, fixed: true },
+                { label: "Feb", name: "C02", width: 130, fixed: true },
+                { label: "Mar", name: "C03", width: 130, fixed: true },
+                { label: "Apr", name: "C04", width: 130, fixed: true },
+                { label: "May", name: "C05", width: 130, fixed: true },
+                { label: "Jun", name: "C06", width: 130, fixed: true },
+                { label: "Jul", name: "C07", width: 130, fixed: true },
+                { label: "Aug", name: "C08", width: 130, fixed: true },
+                { label: "Sep", name: "C09", width: 130, fixed: true },
+                { label: "Oct", name: "C10", width: 130, fixed: true },
+                { label: "Nov", name: "C11", width: 130, fixed: true },
+                { label: "Dec", name: "C12", width: 130, fixed: true }
+            
+            ],
+            sortname: "COL",
+            height: '100px',
+            sortorder: "desc",
+            additionalLoadCompleteAction: function (json) {
+                     
+            }
+           
+        });
+    $grid.jqGrid('setFrozenColumns');//滑动时此列冻结设置
+}
+
+function initGird1() {
+    $grid1 = $("#list1").jgridview(
+        {
+            datatype: "local",
+            multiselect: false,
+            loadonce: false,
+            shrinkToFit: true,
+            url: '/Reporting/EQPUpTimeRpt/QueryYearTotalInfo',
+            colModel: [
+                {
+                    label: "Type", name: "COL", width: 130, fixed: true, frozen: true,
+                    cellattr: function (rowId, val, rawObject, cm, rdata) {
+                        //判断是否符合条件
+                        return " style='color:red;font-weight:bold;'";
+                    }
+                },
+                { label: "first half", name: "HY1", width: 130, fixed: true },
+                { label: "second half", name: "HY2", width: 130, fixed: true }
+              
+            ],
+            pager:'pager1',
+            sortname: "COL",
+            height: '100px',
+            sortorder: "DESC",
+            additionalLoadCompleteAction: function (json) {
+
+            }
+
+        });
+}
+
+function initGird2() {
+    $grid2 = $("#list2").jgridview(
+        {
+            datatype: "local",
+            multiselect: false,
+            loadonce: false,
+            shrinkToFit: true,
+            url: '/Reporting/EQPUpTimeRpt/QuerySingleInfo',
+            colModel: [
+                { label: "State", name: "STATE", width: 130, fixed: true, frozen: true },
+                {
+                    label: "Type", name: "COL", width: 130, fixed: true, frozen: true,
+                    cellattr: function (rowId, val, rawObject, cm, rdata) {
+                        //判断是否符合条件
+                        return " style='color:red;font-weight:bold;'";
+                    }
+
+                },
+                { label: "Jan", name: "C01", width: 130, fixed: true },
+                { label: "Feb", name: "C02", width: 130, fixed: true },
+                { label: "Mar", name: "C03", width: 130, fixed: true },
+                { label: "Apr", name: "C04", width: 130, fixed: true },
+                { label: "May", name: "C05", width: 130, fixed: true },
+                { label: "Jun", name: "C06", width: 130, fixed: true },
+                { label: "Jul", name: "C07", width: 130, fixed: true },
+                { label: "Aug", name: "C08", width: 130, fixed: true },
+                { label: "Sep", name: "C09", width: 130, fixed: true },
+                { label: "Oct", name: "C10", width: 130, fixed: true },
+                { label: "Nov", name: "C11", width: 130, fixed: true },
+                { label: "Dec", name: "C12", width: 130, fixed: true }
+            ],
+            pager: 'pager2',
+            sortname: "COL",
+            height: '100px',
+            sortorder: "DESC",
+            additionalLoadCompleteAction: function (json) {
+
+            }
+
+        });
+    $grid2.jqGrid('setFrozenColumns');//滑动时此列冻结设置
+}
+
+function initGird3() {
+    $grid3 = $("#list3").jgridview(
+        {
+            datatype: "local",
+            multiselect: false,
+            loadonce: false,
+            shrinkToFit: true,
+            url: '/Reporting/EQPUpTimeRpt/QueryToolInfo',
+            colModel: [
+                {
+                    label: "Status", name: "STATUS", width: 130, fixed: true,
+                    cellattr: function (rowId, val, rawObject, cm, rdata) {
+                        //判断是否符合条件
+                        return " style='color:red;font-weight:bold;'";
+                    }
+
+                },
+                { label: "Type", name: "VALDATA", width: 130, fixed: true },
+                { label: "Time(hr)", name: "HOUR", width: 130, fixed: true },
+                { label: "Percent(%)", name: "PERCENT", width: 130, fixed: true }
+
+            ],
+            pager: 'pager3',
+            sortname: "MODIFIABLE",
+            height: '500px',
+            sortorder: "desc",
+            additionalLoadCompleteAction: function (json) {
+
+            }
+
+        });
+}

@@ -1,0 +1,48 @@
+﻿using EIP.Common.Entities.Paging;
+using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace HiDM.Reporting.DataAccess
+{
+    public class EmployInfoRepository : ReportingRepository, IEmployInfoRepository
+    {
+        public Task<PagedResults> GetEmployListAsync(Models.QueryEmployInfoInput input) 
+        {
+            return base.PagingQueryAsyncDataTable(QueryEmployListSQL, input);
+        }
+
+        public Task<DataTable> GetEmploySummaryAsync(Models.QueryEmployInfoInput input)
+        {
+//            string sql = string.Format(QueryEmploySummarySQL, "\"name\"", "\"value\"");
+            return base.QueryAsyncDataTable(QueryEmploySummarySQL, "Summary", input.GetManualParams());
+        }
+
+        public PagedResults GetEmployListSync(Models.QueryEmployInfoInput input)
+        {
+            return base.PagingQueryDataTable(QueryEmployListSQL, input);
+        }
+
+        public DataTable GetEmploySummarySync(Models.QueryEmployInfoInput input)
+        {
+            return base.QueryDataTable(QueryEmploySummarySQL, "Summary", input.GetManualParams());
+        }
+
+        //:EmployId 为model中的成员变量名
+        private string QueryEmployListSQL = @"select emp.id,emp.employee_name,emp.e_employee_name,emp.email,
+                                              emp.pager,emp.extension_no,emp.chinese_title,emp.english_title,
+                                              emp.dept_code,emp.dept_name,emp.e_dept_name,emp.group_code,
+                                              emp.dir_manager,emp.rep_empno,emp.action_flag,emp.rcd_date,
+                                              emp.basic_person,emp.basic_org,@rowNumber, @recordCount 
+                                              from emp @where AND emp.id = DECODE(NVL(:EmployId,' '),' ',id,:EmployId)
+                                              AND emp.dept_code = DECODE(NVL(:DepetCode,' '),' ',emp.dept_code,:DepetCode)";
+
+        private string QueryEmploySummarySQL = @"select 'abc' Series ,emp.dept_code name,count(emp.id) value from emp where
+                                               emp.id = DECODE(NVL(:EmployId,' '),' ',id,:EmployId) 
+                                               AND emp.dept_code = DECODE(NVL(:DepetCode,' '),' ',emp.dept_code,:DepetCode) 
+                                               group by emp.dept_code";
+    }
+}

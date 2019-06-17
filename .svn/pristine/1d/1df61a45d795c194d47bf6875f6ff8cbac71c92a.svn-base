@@ -1,0 +1,95 @@
+﻿@using EIP.Common.Entities
+@using EIP.Common.Entities.Dtos
+@using EIP.Web.DataUsers.Helpers
+
+@{
+    ViewBag.Title = "Employ Information";
+    ViewBag.Require = "reporting-employinfo";<!--这里是注释不会在页面中显示，此处定义view使用的js文件，reporting-employinfo与实际的js文件名的映射关系在scripts/page.js中指定-->
+    Layout = "~/Views/Shared/_LayoutPageBaseList.cshtml";
+}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class=" panel panel-primary">
+                <div class="panel-body">
+                    <form class="form-inline  form-horizontal">
+                        <div class="form-group">
+                            <label for="EmployID" class="control-label col-sm-5">Employ ID(工号):</label>
+                            <div class="col-sm-7">
+                                <input type="text" name="EmployeeID" class="form-control" />
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="Dept" class="control-label  col-sm-5">Depet(部门):</label>
+                            <div class="col-sm-7">
+                                @Html.DropDownListSQL(new DropDownListSQLInput
+                                        {
+                                            ConnectionString = "HiDM.Reporting.DataAccess",
+                                            SQL = "SELECT DEPT_CODE VALUE, DEPT_NAME NAME FROM EMP GROUP BY DEPT_CODE,DEPT_NAME",
+                                            Name = "DepetCode",
+                                            NeedDefault = true,
+                                            HtmlAttributes = new { @class = "form-control manualfilter" }
+                                        })
+                            </div>
+                        </div>
+                        <div class="form-group pull-right">
+                            <div class="col-sm-6">
+                                <input type="button" name="btn_select_box" value="搜 索" class="btn btn-primary pull-right" />
+                            </div>
+                            <div class="col-sm-6">
+                                <input type="button" name="btn_reset_box" value="重 置" class="btn pull-right">
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Employ Details</h3>
+                </div>
+                <div class="panel-body" id="listpnlbody">
+                    <table id="list"></table>
+                    <div id="pager"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-4">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">员工分布图</h3><small>各部门人员信息</small>
+                </div>
+                <div class="panel-body">
+                    <div class="det_inner" id="browserAnalysisBar" style="height: 300px"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">员工分布图</h3><small>各部门人员信息</small>
+                </div>
+                <div class="panel-body">
+                    <div class="det_inner" id="browserAnalysisPie" style="height: 300px"></div>
+                </div>
+            </div>
+        </div>
+        <div class="col-lg-4">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">员工分布图</h3><small>各部门人员信息</small>
+                </div>
+                <div class="panel-body">
+                    <div class="det_inner" id="browserAnalysisLine" style="height: 300px"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

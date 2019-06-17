@@ -1,0 +1,28 @@
+﻿var echarts, $, jQuery;
+define([
+    'echarts',
+    'jquery',
+    'select2zhcn',
+    'bootstrap',
+    'jqgrid',
+    'jgridview',
+    'listview',
+    'language',
+    'solutionFun',
+    'artdialog',
+    'artdialogIframeTools',
+    'wdatepicker'],
+    function (echarts, $) {
+        $ = this.$;
+        jQuery = this.$;
+        this.echarts = echarts;
+        ValidformNeed();
+        $('body').css('overflow', 'scroll');
+        $.fn.select2.defaults.set("theme", "bootstrap");
+        $(window).resize(function () {
+            if (typeof windowResized !== 'undefined' && windowResized instanceof Function) {
+                windowResized();
+            }
+        });
+
+    });

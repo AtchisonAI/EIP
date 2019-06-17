@@ -1,0 +1,75 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using EIP.Common.Entities.Paging;
+using System.Data;
+
+namespace HiDM.Reporting.DataAccess
+{
+    public class QueryInfoRepository:ReportingRepository, IQueryInfoRepository
+    {
+        public PagedResults GetQueryInfoList(Models.QueryInfoInput InfoInput)
+        {
+            string filter = string.Empty;
+            if (InfoInput.ProductID != null && InfoInput.ProductID.Length > 0)
+            {
+                filter = string.Format("AND ProductID IN ('{0}') ", InfoInput.ProductID);
+            }
+
+            if (InfoInput.Priority != null && InfoInput.Priority.Length > 0)
+            {
+                filter = string.Format("AND Priority IN ('{0}') ", InfoInput.Priority);
+            }
+
+            if (InfoInput.InternalPriority != null && InfoInput.InternalPriority.Length > 0)
+            {
+                filter = string.Format("AND InternalPriority IN ('{0}') ", InfoInput.InternalPriority);
+            }
+
+            string sql = string.Format(listSQL, filter);
+            return base.PagingQueryDataTable(sql, InfoInput);
+
+        }
+
+        public PagedResults GetQueryInfoList1(Models.QueryInfoInput InfoInput)
+        {
+            string filter = string.Empty;
+            if (InfoInput.ProductID != null && InfoInput.ProductID.Length > 0)
+            {
+                filter = string.Format("AND ProductID IN ('{0}') ", InfoInput.ProductID);
+            }
+
+            if (InfoInput.Priority != null && InfoInput.Priority.Length > 0)
+            {
+                filter = string.Format("AND Priority IN ('{0}') ", InfoInput.Priority);
+            }
+
+            if (InfoInput.InternalPriority != null && InfoInput.InternalPriority.Length > 0)
+            {
+                filter = string.Format("AND InternalPriority IN ('{0}') ", InfoInput.InternalPriority);
+            }
+
+            string sql = string.Format(listSQL1, filter);
+            return base.PagingQueryDataTable(sql, InfoInput);
+
+        }
+
+        private string listSQL = @"SELECT LOTTYPE,V_DATE ,
+        BOH,EOH,MOVESTAGE,movestage/EOH as TR,
+       @rowNumber, @recordCount
+       FROM TEST_FOR_CAROL_REPORT 
+       @where and V_DATE between to_date(:StartTime,'yyyy-mm-dd hh24:mi:ss') and to_date(:EndTime,'yyyy-mm-dd hh24:mi:ss')
+       and lottype='P' order by v_date";
+
+        private string listSQL1 = @"SELECT LOTTYPE, 
+        BOH,EOH,MOVESTAGE,
+       @rowNumber, @recordCount
+       FROM TEST_FOR_CAROL_REPORT 
+       @where and V_DATE between to_date(:StartTime,'yyyy-mm-dd hh24:mi:ss') and to_date(:EndTime,'yyyy-mm-dd hh24:mi:ss')
+       and lottype='F' order by v_date";
+
+
+    }
+}

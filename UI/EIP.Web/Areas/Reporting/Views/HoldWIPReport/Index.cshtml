@@ -1,0 +1,110 @@
+﻿@using EIP.Common.Entities
+@using EIP.Common.Entities.Dtos
+@using EIP.Web.DataUsers.Helpers
+
+@{
+    ViewBag.Title = "Hold WIP Report";
+    ViewBag.Require = "reporting-holdwipreport-querywipholdinfo";
+    Layout = "~/Views/Shared/_LayoutPageBaseList.cshtml";
+}
+
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel-group" id="accordion">
+                <div class=" panel panel-primary">
+                    <div class="panel-heading text-center">
+                        <h3 class="panel-title">
+                            <a data-toggle="collapse" data-parent="#accordion" href="#condition">
+                                Hold WIP Report
+                            </a>
+                        </h3>
+                    </div>
+                    <div id="condition" class="panel-collapse collapsed in">
+                        <div class="panel-body">
+                            <form class="form-horizontal">
+                                <div class="row">
+                                    <div class="col-lg-3">
+                                        <div class="col-sm-12 text-right">
+                                            Lot Type：@Html.DropDownListSQL(new DropDownListSQLInput
+                                            {
+                                            ConnectionString = "HiDM.Reporting.DataAccess",
+                                            SQL = @"select t.LotType value, t.Description name
+                                            from FwLotTemplate T, FwLot L
+                                            where T.lotTemplate = L.sysId
+                                            and L.materialType != 'Durable'
+                                            order by T.lotType
+                                            ",
+                                            Name = "LotType",
+                                            NeedDefault = true,
+                                            HtmlAttributes =  new { @class = "manualfilter"}
+                                            })
+                                        </div>
+                                    </div>
+                                    <div class="col-lg-3">
+                                        <div class="col-sm-12 text-left">
+                                            Area：@Html.DropDownListSQL(new DropDownListSQLInput
+                                            {
+                                            ConnectionString = "HiDM.Reporting.DataAccess",
+                                            SQL = @"select * from (select distinct NVL( RTRIM(EEX.area, ' '),'ALL')  value, NVL(RTRIM(MAV.description,' '),'ALL')  name
+                                            from FabEqpEquipmentExt EEX, FwMfgAreaVersion MAV
+                                            where EEX.area = MAV.name(+)
+                                            and MAV.revState(+) = 'Active'  )t
+                                            order by t.value ,t.name
+                                            ",
+                                            Name = "Location",
+                                            NeedDefault = true,
+                                            HtmlAttributes =  new { @class = "manualfilter"}
+                                            })
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row" style="padding-top:10px;">
+                                    <div class="col-lg-10"></div>
+                                    <div class="col-lg-2">
+                                        <div class="col-sm-6">
+                                            <input type="button" name="btn_select_box" value="搜 索" class="btn btn-primary pull-right" />
+                                        </div>
+                                        <div class="col-sm-6">
+                                            <input type="button" name="btn_reset_box" value="重 置" class="btn pull-right">
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Hold WIP Report</h3>
+                    <small>Refresh Time = <span id="refreshTime"></span></small>
+                </div>
+                <div class="panel-body" id="listpnlbody">
+                    <table id="list" class="grid"></table>
+                    <div id="pager"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-12">
+            <div class="panel panel-info">
+                <div class="panel-heading">
+                    <h3 class="panel-title">Hold Detail</h3>
+                </div>
+                <div class="panel-body" id="listpnlbody">
+                    <table id="list1"></table>
+                    <div id="pager1"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+</div>

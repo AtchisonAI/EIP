@@ -1,0 +1,53 @@
+﻿@using EIP.Common.Entities
+@using EIP.Common.Entities.Dtos
+@using EIP.Web.DataUsers.Helpers
+
+@{
+    ViewBag.Title = "Product Information";
+    ViewBag.Require = "reporting-jason-product";
+    Layout = "~/Views/Shared/_LayoutPageBaseList.cshtml";
+}
+
+<div class="ui-layout-center" style="border-style: none">
+    <div id="layout" class="layoutdiv ui-layout-container">
+        <div id="uiCenter" class="ui-layout-center" style="border-style: none">
+            <div id="layoutToolBar" class="layoutdiv ui-layout-container">
+                <div id="uiCenterToolBar" class="ui-layout-center" style="border-style: none">
+                    <table id="list"></table>
+                    <div id="pager"></div>
+
+                </div>
+                <div id="uiNorthToolBar" class="ui-layout-north" style="border-color: #ccc; border-style: solid; border-width: 1px">
+                    <div class="tools-box">
+                        <div class="tools-box-left" id="partial_button_toolbar">
+                            @{ Html.RenderPartial("~/Areas/Common/Views/Shared/_PartialButton.cshtml"); }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="uiNorth" class="ui-layout-north" style="border-color: #ccc; border-style: solid; border-width: 1px">
+            <div class="select_box">
+                <form>
+
+                    Product Name：@Html.DropDownListSQL(new DropDownListSQLInput
+                    {
+                    ConnectionString = "HiDM.Reporting.DataAccess",
+                    SQL = "SELECT T.NAME,T.NAME VALUE FROM  FWPRODUCT T ORDER BY NAME",
+                    Name = "PRODUCTNAME",
+                    NeedDefault = true,
+                    HtmlAttributes =  new { @class = "manualfilter"}
+
+                    })
+                    <input type="button" name="btn_select_box" value="搜 索" class="btnSearch">
+                    <input type="button" name="btn_reset_box" value="重 置" class="btnSearch">
+
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div id="uiSouth" class="ui-layout-south" style="border-color: #ccc; border-style: solid; border-width: 1px;overflow: auto">
+    <div class="det_inner" id="browserAnalysis" style="height: 500px"></div>
+</div>

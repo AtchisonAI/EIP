@@ -1,0 +1,31 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Data;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using EIP.Common.Entities.Paging;
+using HiDM.Reporting.Models;
+
+namespace HiDM.Reporting.DataAccess
+{
+    public interface IEQPGroupPerformanceRepository
+    {
+       
+        PagedResults GetEQPGroupPerformance(EQPGroupPerformanceInput Input);
+
+        PagedResults GetEQPGroupWipDetail(EQPGroupPerformanceSubPageInput Input);
+
+        PagedResults GetEQPGroupMoveDetail(EQPGroupPerformanceSubPageInput Input);
+
+        PagedResults GetEQPGroupWipMoveDetail(EQPGroupPerformanceSubPageInput Input);
+
+        DataTable QueryEQPGroupWipInfo(EQPGroupPerformanceSubPageInput Input);
+
+        DataTable QueryEQPGroupMoveInfo(EQPGroupPerformanceSubPageInput Input);
+
+        DataTable QueryEQPGroupAvailInfo(EQPGroupPerformanceSubPageInput Input);
+
+    }
+
+}

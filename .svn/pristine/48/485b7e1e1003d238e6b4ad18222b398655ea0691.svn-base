@@ -1,0 +1,24 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Web;
+using System.Web.Mvc;
+using HiDM.Reporting.Business.EmployInfo;
+using EIP.Common.Core.Attributes;
+using System.EnterpriseServices;
+using System.Threading.Tasks;
+using HiDM.Reporting.Models;
+using EIP.Common.Web;
+using HiDM.Reporting.Business;
+
+namespace EIP.Web.Areas.Reporting.Controllers
+{
+    public class EQPUpTimeRptController : BaseController
+    {
+        // GET: Reporting/EQPUpTimeRpt
+        public ActionResult Index()
+        {
+            return View();
+        }
+    }
+}
